@@ -13,9 +13,9 @@ function App() {
     if (username !== "" && room !== "") {
       socket.emit("join_room", room, (success) => {
         if (success) {
-          console.log(`Successfully joined room ${room}`);
+          console.log(`Successfully joined room: ${room}`);
         } else {
-          console.log(`Failed to join room ${room}`);
+          console.log(`Failed to join room: ${room}`);
         }
       });
     }
