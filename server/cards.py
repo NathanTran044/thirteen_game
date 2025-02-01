@@ -1,4 +1,3 @@
-print("Hello world")
 import random
 CARDS_PER_PLAYER = 13
 

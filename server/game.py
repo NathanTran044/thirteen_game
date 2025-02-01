@@ -31,6 +31,4 @@ def find_first_player(player_cards):
 
     return min_index
     
-
-
 play()
