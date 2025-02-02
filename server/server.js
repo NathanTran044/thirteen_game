@@ -19,8 +19,15 @@ io.on("connection", (socket) => {
 
   socket.on("join_room", (room, callback) => {
     socket.join(room);
-    console.log(`User ${socket.id} joined room: ${room}`);
-    callback(true);
+    socket.room = room;
+    
+    const roomSize = io.sockets.adapter.rooms.get(room)?.size || 0;
+    console.log(`User ${socket.id} joined room: ${room}, Total users: ${roomSize}`);
+        
+    io.to(room).emit("room_size_update", roomSize);
+    
+    // Send the updated room size back to the joining user
+    callback(true, roomSize);
   });
 
   socket.on("send_message", (data) => {
@@ -29,6 +36,14 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log(`User Disconnected: ${socket.id}`);
+    if (socket.room) {
+        const room = socket.room;
+        socket.leave(room);
+
+        const roomSize = io.sockets.adapter.rooms.get(room)?.size || 0;
+        io.to(room).emit("room_size_update", roomSize);
+        console.log(`Updated room size for ${room}: ${roomSize}`);
+    }
   });
 });
 
