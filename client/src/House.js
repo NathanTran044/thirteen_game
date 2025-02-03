@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import GameLogic from './GameLogic';
 
 function House({ socket }) {
   const [username, setUsername] = useState("");
@@ -63,6 +64,8 @@ function House({ socket }) {
       <button onClick={joinRoom}>Join Room</button>
 
       <h3>Users in Room: {roomSize}</h3>
+
+      <GameLogic roomSize={roomSize}/>
 
       <div>
         <input
