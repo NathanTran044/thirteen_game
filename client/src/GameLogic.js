@@ -1,38 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { io } from "socket.io-client";
 
-const socket = io("http://localhost:5001");
-
-function GameLogic({ roomSize }) {
+function GameLogic({ socket, room, roomSize, newGameId }) {
   const [playerCards, setPlayerCards] = useState([]);
-  const [gameId, setGameId] = useState(null);
+  const [gameId, setGameId] = useState(newGameId);
 
   // Start Game: Calls Python backend
-  const startGame = async () => {
+  const startGame = () => {
     if (roomSize >= 1 && roomSize <= 4) {
-      try {
-        const response = await fetch("http://localhost:5001/start_game", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ num_players: roomSize }),
-          mode: "cors",
-          credentials: "include",
-        });
-
-        if (!response.ok) throw new Error("Failed to start game");
-
-        const data = await response.json();
-        setGameId(data.game_id);
-        setPlayerCards(data.player_cards);
-      } catch (error) {
-        console.error("Error:", error);
-      }
+      socket.emit("start_game", { num_players: roomSize, room });
+  
     } else {
       console.log("Wrong number of players");
     }
   };
 
-  // Listen for real-time game state updates
   useEffect(() => {
     socket.on("game_state_update", (data) => {
       console.log("Game state updated:", data);
@@ -40,10 +21,14 @@ function GameLogic({ roomSize }) {
       setPlayerCards(data.player_cards);
     });
 
+    if (newGameId) {
+      setGameId(newGameId);
+    }
+
     return () => {
       socket.off("game_state_update"); // Cleanup
     };
-  }, []);
+  }, [newGameId]);
 
   return (
     <div>

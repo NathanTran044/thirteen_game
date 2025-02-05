@@ -7,6 +7,7 @@ function House({ socket }) {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]);
   const [roomSize, setRoomSize] = useState(0);
+  const [gameId, setGameId] = useState("")
 
   // Join Room
   const joinRoom = () => {
@@ -37,13 +38,14 @@ function House({ socket }) {
       setMessages((prev) => [...prev, data]);
     });
 
-    socket.on("room_size_update", (size) => {
-      setRoomSize(size);
+    socket.on("room_info_update", ({ roomSize, gameId }) => {
+      setRoomSize(roomSize);
+      setGameId(gameId);
     });
 
     return () => {
       socket.off("receive_message");
-      socket.off("room_size_update");
+      socket.off("room_info_update");
     };
   }, [socket]);
 
@@ -65,7 +67,7 @@ function House({ socket }) {
 
       <h3>Users in Room: {roomSize}</h3>
 
-      <GameLogic roomSize={roomSize}/>
+      <GameLogic socket={socket} room={room} roomSize={roomSize} newGameId={gameId}/>
 
       <div>
         <input

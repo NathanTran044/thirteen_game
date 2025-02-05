@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, join_room, rooms
 import random
 import uuid
 
@@ -46,10 +46,22 @@ def start_game():
     game_id = str(uuid.uuid4())
     game_sessions[game_id] = player_cards
 
+    # print("room is ", data.get('room'))
+    # all_rooms = socketio.server.manager.rooms
+
+    # # Ensure the room exists before accessing it
+    # room_size = len(all_rooms.get('/', {}).get(data.get('room'), set()))
+    # print("room size is ", room_size)
+
+    room = data.get('room')
+    room_size = len(socketio.server.manager.rooms.get("/", {}).get(room, set()))
+
+    print(f"Room {room} size: {room_size}")
+
     socketio.emit('game_state_update', {
         'game_id': game_id,
         'player_cards': player_cards
-    }, room=game_id) # only players in room get updated cards
+    }, room=2) # only players in room get updated cards
 
     return jsonify({
         'game_id': game_id,
