@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 function GameLogic({ socket, room, roomSize, newGameId }) {
   const [playerCards, setPlayerCards] = useState([]);
   const [gameId, setGameId] = useState(newGameId);
+  const [gameStarted, setGameStarted] = useState(false);
+  const [selectedCard, setSelectedCard] = useState("");
 
   // Start Game: Calls Python backend
   const startGame = () => {
@@ -14,11 +16,20 @@ function GameLogic({ socket, room, roomSize, newGameId }) {
     }
   };
 
+  const playCard = () => {
+    console.log("Card played " + selectedCard);
+  };
+
   useEffect(() => {
     socket.on("game_state_update", (data) => {
       console.log("Game state updated:", data);
       setGameId(data.game_id);
       setPlayerCards(data.player_cards);
+    });
+
+    socket.on("begin_game", () => {
+      console.log("Game begin");
+      setGameStarted(true);
     });
 
     if (newGameId) {
@@ -49,6 +60,19 @@ function GameLogic({ socket, room, roomSize, newGameId }) {
             <p>{hand.join(", ")}</p>
           </div>
         ))}
+
+
+      {gameStarted && (
+        <div>
+          <input
+            type="text"
+            placeholder="Enter card to play"
+            value={selectedCard}
+            onChange={(e) => setSelectedCard(e.target.value)}
+          />
+          <button onClick={playCard}>Play Card</button>
+        </div>
+      )}
     </div>
   );
 }

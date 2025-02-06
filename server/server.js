@@ -19,7 +19,7 @@ const io = new Server(server, {
 // Constants
 const CARDS_PER_PLAYER = 13;
 const ALL_CARDS = ["3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A", "2"]
-  .flatMap((c) => ["S", "C", "D", "H"].map((s) => `${c} ${s}`));
+  .flatMap((c) => ["S", "C", "D", "H"].map((s) => `${c}${s}`));
 
 const gameSessions = {}; // Store game states
 
@@ -79,7 +79,8 @@ io.on("connection", (socket) => {
     const game_id = uuidv4();
     gameSessions[game_id] = player_cards;
 
-    // Emit game state update to only players in the room
+    // Emit begin game and game state update to only players in the room
+    io.to(room).emit("begin_game");
     io.to(room).emit("game_state_update", { game_id, player_cards });
 
     io.sockets.adapter.rooms.get(room).forEach((socketId) => {
