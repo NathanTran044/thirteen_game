@@ -40,15 +40,22 @@ io.on("connection", (socket) => {
   });
 
   socket.on("join_room", (room, callback) => {
-    socket.join(room);
-    console.log("joining room ", room, typeof(room))
-    socket.room = room;
+    const roomName = String(room);
 
-    const roomSize = io.sockets.adapter.rooms.get(room)?.size || 0;
-    console.log(`User ${socket.id} joined room: ${room}, Total users: ${roomSize}`);
+    if (socket.room) {
+      console.log(`User ${socket.id} leaving previous room: ${socket.room}`);
+      socket.leave(socket.room);
+    }
+
+    socket.join(roomName);
+    console.log("joining room ", roomName, typeof(room))
+    socket.room = roomName;
+
+    const roomSize = io.sockets.adapter.rooms.get(roomName)?.size || 0;
+    console.log(`User ${socket.id} joined room: ${roomName}, Total users: ${roomSize}`);
 
     const gameId = uuidv4();
-    io.to(room).emit("room_info_update", { roomSize, gameId });
+    io.to(roomName).emit("room_info_update", { roomSize, gameId });
 
     callback(true, roomSize);
   });
