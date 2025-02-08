@@ -5,6 +5,7 @@ function GameLogic({ socket, room, roomSize, newGameId }) {
   const [gameId, setGameId] = useState(newGameId);
   const [gameStarted, setGameStarted] = useState(false);
   const [selectedCard, setSelectedCard] = useState("");
+  const [currentTurn, setCurrentTurn] = useState(false);
 
   // Start Game: Calls Python backend
   const startGame = () => {
@@ -17,19 +18,36 @@ function GameLogic({ socket, room, roomSize, newGameId }) {
   };
 
   const playCard = () => {
-    console.log("Card played " + selectedCard);
+    console.log("GameId and Card played: " + gameId + " " + selectedCard);
+    socket.emit("play_card", { gameId, selectedCard });
+    setSelectedCard("")
   };
 
   useEffect(() => {
-    socket.on("game_state_update", (data) => {
-      console.log("Game state updated:", data);
-      setGameId(data.game_id);
-      setPlayerCards(data.player_cards);
-    });
-
     socket.on("begin_game", () => {
       console.log("Game begin");
       setGameStarted(true);
+    });
+
+    socket.on("game_state_update", (data) => {
+      console.log("Game state updated:", data);
+      setGameId(data.gameId);
+      setCurrentTurn(data.current_turn);
+    });
+
+    socket.on("player_hand", (data) => {
+      console.log("Player hand updated:", data);
+      setPlayerCards(data);
+    })
+
+    socket.on("invalid_move", (data) => {
+      alert(data.message);
+    });
+  
+    socket.on("game_over", (data) => {
+      setPlayerCards([]);
+      alert(`Game over! Winner: ${data.winner}`);
+      setGameStarted(false);
     });
 
     if (newGameId) {
@@ -37,7 +55,11 @@ function GameLogic({ socket, room, roomSize, newGameId }) {
     }
 
     return () => {
-      socket.off("game_state_update"); // Cleanup
+      socket.off("begin_game");
+      socket.off("game_state_update");
+      socket.off("player_hand");
+      socket.off("invalid_move");
+      socket.off("game_over");
     };
   }, [newGameId]);
 
@@ -53,14 +75,11 @@ function GameLogic({ socket, room, roomSize, newGameId }) {
         </div>
       )}
 
-      {playerCards.length > 0 &&
-        playerCards.map((hand, index) => (
-          <div key={index}>
-            <h4>Player {index + 1} Hand:</h4>
-            <p>{hand.join(", ")}</p>
-          </div>
-        ))}
-
+      {playerCards.length > 0 && (
+        <div>
+          <p>{playerCards.join(", ")}</p>
+        </div>
+      )}
 
       {gameStarted && (
         <div>
@@ -70,6 +89,7 @@ function GameLogic({ socket, room, roomSize, newGameId }) {
             value={selectedCard}
             onChange={(e) => setSelectedCard(e.target.value)}
           />
+          
           <button onClick={playCard}>Play Card</button>
         </div>
       )}

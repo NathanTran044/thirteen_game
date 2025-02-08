@@ -12,9 +12,9 @@ function House({ socket }) {
   // Join Room
   const joinRoom = () => {
     if (username !== "" && room !== "") {
-      socket.emit("join_room", room, (success, updatedSize) => {
+      socket.emit("join_room", room, (success, updatedSize, id) => {
         if (success) {
-          console.log(`Successfully joined room: ${room}`);
+          console.log(`${id} Successfully joined room: ${room}`);
           setRoomSize(updatedSize); // Update room size immediately
         } else {
           console.log(`Failed to join room: ${room}`);
