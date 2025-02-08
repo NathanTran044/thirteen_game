@@ -162,6 +162,11 @@ io.on("connection", (socket) => {
       socket.emit("invalid_move", { message: "Not your turn!" });
       return;
     }
+
+    if (selectedCard == "pass") {
+      socket.emit("invalid_move", { message: "Pass!" });
+      return;
+    }
   
     // Validate if player has the selectedCard
     if (!currentPlayer.hand.includes(selectedCard)) {

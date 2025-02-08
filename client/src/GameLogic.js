@@ -23,6 +23,11 @@ function GameLogic({ socket, room, roomSize, newGameId }) {
     setSelectedCard("")
   };
 
+  const passTurn = () => {
+    console.log("Passing");
+    socket.emit("play_card", { gameId, selectedCard: "pass" });
+  }
+
   useEffect(() => {
     socket.on("begin_game", () => {
       console.log("Game begin");
@@ -91,6 +96,7 @@ function GameLogic({ socket, room, roomSize, newGameId }) {
           />
           
           <button onClick={playCard}>Play Card</button>
+          <button onClick={passTurn}>Pass</button>
         </div>
       )}
     </div>
