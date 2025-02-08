@@ -51,6 +51,66 @@ const dealCards = (numPlayers) => {
   );
 };
 
+// Checks if all the cards have same value
+const allSame = (cards) => {
+  const firstValue = cards[0].slice(0, -1);
+
+  for (let card of cards) {
+    if (card.slice(0, -1) !== firstValue) {
+      return false;
+    }
+  }
+  return true;
+};
+
+const validStraight = (cards) => {
+  const order = ["3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+
+  const values = cards.map(card => card.slice(0, -1));
+
+  if (values.includes("2")) return false;
+
+  values.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+
+  for (let i = 1; i < values.length; i++) {
+    if (order.indexOf(values[i]) !== order.indexOf(values[i - 1]) + 1) {
+      return false; // Not consecutive
+    }
+  }
+
+  return true;
+};
+
+const validDoubleStraight = (cards) => {
+  if (cards.length < 6 || cards.length % 2 != 0) {
+    return false;
+  }
+
+  const order = ["3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+
+  const values = cards.map(card => card.slice(0, -1));
+
+  if (values.includes("2")) return false;
+
+  values.sort((a, b) => order.indexOf(a) - order.indexOf(b));
+
+  // check pairs
+  for (let i = 0; i < values.length; i += 2) {
+    if (order.indexOf(values[i]) !== order.indexOf(values[i + 1])) {
+      return false;
+    }
+  }
+
+  // check consecutive
+  for (let i = 2; i < values.length; i += 2) {
+    if (order.indexOf(values[i]) !== order.indexOf(values[i - 1]) + 1) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
 // Socket.io event handlers
 io.on("connection", (socket) => {
   console.log(`User Connected: ${socket.id}`);
@@ -145,8 +205,11 @@ io.on("connection", (socket) => {
   });
 
   socket.on("play_card", ({ gameId, selectedCard }) => {
-    console.log("game sessions: ");
+    console.log("RUNNING play_card");
     console.log(gameSessions);
+    for (let player of gameSessions[gameId].players) {
+      console.log(player);
+    }
     console.log("gameId " + gameId + " selectedCard: " + selectedCard);
 
     if (!gameId || !gameSessions[gameId]) {
@@ -156,27 +219,134 @@ io.on("connection", (socket) => {
   
     let game = gameSessions[gameId];
     let currentPlayer = game.players[game.currentPlayerIndex];
+    console.log("current player is " + String(currentPlayer.id))
   
     if (socket.id !== currentPlayer.id) {
-      console.log("not player's turn")
+      console.log("Not player's turn");
       socket.emit("invalid_move", { message: "Not your turn!" });
       return;
     }
 
+    // Check if player already skipped
+    console.log("Checking if skipped " + String(currentPlayer.skipped))
+    // if (currentPlayer.skipped) {
+    //   console.log("Player already skipped this round");
+    //   game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+  
+    //   io.to(game.room).emit("game_state_update", {
+    //     gameId,
+    //     current_turn: game.players[game.currentPlayerIndex].id,
+    //   });
+    //   return;
+    // }
+
+    // Check if player plays nothing
+    if (selectedCard == "") {
+      socket.emit("invalid_move", { message: "Must play a card or pass" });
+      return;
+    }
+
+    // If a player passes
     if (selectedCard == "pass") {
-      socket.emit("invalid_move", { message: "Pass!" });
+      currentPlayer.skipped = true;
+
+      do {
+        game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+      } while (game.players[game.currentPlayerIndex].skipped);
+  
+      io.to(game.room).emit("game_state_update", {
+        gameId,
+        current_turn: game.players[game.currentPlayerIndex].id,
+      });
       return;
     }
   
-    // Validate if player has the selectedCard
-    if (!currentPlayer.hand.includes(selectedCard)) {
-      console.log("selectedCard being played not found")
-      socket.emit("invalid_move", { message: "card not in hand!" });
-      return;
+    // Split the cards
+    const cards = selectedCard.split(" ");
+    
+    // Check if its open play
+    if (game.lastPlayedIndex == game.currentPlayerIndex) {
+      console.log("Free to play!");
+      // Reset all skips
+      for (let player of game.players) {
+        player.skipped = false;
+      }
+
+      // Check if card combination is valid
+      const numCards = cards.length
+      switch (numCards) {
+        case 1:
+          break;
+        case 2:
+          if (!allSame(cards)) {
+            socket.emit("invalid_move", { message: "Cannot play that" });
+            return;
+          }
+          break;
+        case 3:
+        case 4:
+          if (!allSame(cards) && !validStraight(cards)) {
+            socket.emit("invalid_move", { message: "Cannot play that" });
+            return;
+          }
+          break;
+        case 5:
+        case 7:
+        case 9:
+        case 11:
+        case 13:
+          if (!validStraight(cards)) {
+            socket.emit("invalid_move", { message: "Cannot play that" });
+            return;
+          }
+          break;
+        case 6:
+        case 8:
+        case 10:
+        case 12:
+          if (!validStraight(cards) && !validDoubleStraight(cards)) {
+            socket.emit("invalid_move", { message: "Cannot play that" });
+            return;
+          }
+          break;
+      }
+    } else { // Have to follow current pattern
+      console.log("Must follow patern");
+      previousCards = game.lastPlayedCard.split(" ")
+
+      if (allSame(previousCards)) {
+        if (
+          cards.length != previousCards.length || 
+          !allSame(cards) || 
+          cardSort(cards[cards.length - 1], previousCards[previousCards.length - 1]) < 0
+        ) {
+          socket.emit("invalid_move", { message: "Cannot play that" });
+          return;
+        }
+      } else if (validStraight(previousCards)) {
+        if (
+          cards.length != previousCards.length ||
+          !validStraight(cards) ||
+          cardSort(cards[cards.length - 1], previousCards[previousCards.length - 1]) < 0
+        ) {
+          socket.emit("invalid_move", { message: "Cannot play that" });
+          return;
+        }
+      } else if (validDoubleStraight(previousCards)) {
+        if (
+          cards.length != previousCards.length ||
+          !validDoubleStraight(cards) ||
+          cardSort(cards[cards.length - 1], previousCards[previousCards.length - 1]) < 0
+        ) {
+          socket.emit("invalid_move", { message: "Cannot play that" });
+          return;
+        }
+      }
     }
+    
   
     // Play the selectedCard
-    currentPlayer.hand = currentPlayer.hand.filter((c) => c !== selectedCard);
+    currentPlayer.hand = currentPlayer.hand.filter((c) => !cards.includes(c));
     game.lastPlayedCard = selectedCard;
     game.lastPlayedIndex = game.currentPlayerIndex;
 
@@ -190,7 +360,9 @@ io.on("connection", (socket) => {
     }
   
     // Move to next player
-    game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+    do {
+      game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
+    } while (game.players[game.currentPlayerIndex].skipped);
   
     io.to(game.room).emit("game_state_update", {
       gameId,
