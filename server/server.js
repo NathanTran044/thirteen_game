@@ -274,8 +274,7 @@ io.on("connection", (socket) => {
 
     // Win if all cards are 2 or douple-trips
     if (
-      cards.length === 4 && cards.every(card => card.slice(0, -1) === "2") ||
-      validDoubleStraight(cards)
+      cards.length === 4 && cards.every(card => card.slice(0, -1) === "2")
     ) {
       io.to(game.room).emit("game_over", { winner: playerNames[socket.id] });
       delete gameSessions[gameId];
