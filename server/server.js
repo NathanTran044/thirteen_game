@@ -20,7 +20,7 @@ const io = new Server(server, {
 const CARDS_PER_PLAYER = 13;
 const ALL_CARDS = ["3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A", "2"]
   .flatMap((c) => ["S", "C", "D", "H"].map((s) => `${c}${s}`));
-// const ALL_CARDS = ["3", "3", "4", "4", "5", "5", "3", "4", "5", "2", "2", "2", "2"]
+// const ALL_CARDS = ["3", "3", "4", "4", "5", "5", "6", "6", "7", "7", "2", "2", "2"]
 //   .flatMap((c) => ["S", "C", "D", "H"].map((s) => `${c}${s}`));
 
 const gameSessions = {}; // Store game states
@@ -331,7 +331,13 @@ io.on("connection", (socket) => {
       console.log("Must follow patern");
       previousCards = game.lastPlayedCard.split(" ")
 
-      if (allSame(previousCards)) {
+      if (
+        previousCards.length == 1 && 
+        previousCards[0].slice(0, -1) === "2" && 
+        ((cards.length == 4 && allSame(cards)) || (cards.length == 6 && validDoubleStraight(cards)))) {
+          // bomb on a 2, falls through
+      }
+      else if (allSame(previousCards)) {
         if (
           cards.length != previousCards.length || 
           !allSame(cards) || 
