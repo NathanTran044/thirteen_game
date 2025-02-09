@@ -43,9 +43,14 @@ function House({ socket }) {
       setGameId(gameId);
     });
 
+    socket.on("invalid_move", (data) => {
+      alert(data.message);
+    });
+
     return () => {
       socket.off("receive_message");
       socket.off("room_info_update");
+      socket.off("invalid_move");
     };
   }, [socket]);
 

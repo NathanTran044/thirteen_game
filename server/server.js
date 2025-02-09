@@ -125,13 +125,21 @@ io.on("connection", (socket) => {
   socket.on("join_room", ({ username, room }, callback) => {
     const roomName = String(room);
 
+    for (let gameId in gameSessions) {
+      let game = gameSessions[gameId]; // Get the game session object
+      if (game.room == roomName) {
+        socket.emit("invalid_move", { message: "Cannot join room. Game in progress." });
+        return;
+      }
+    }
+
     if (socket.room) {
       console.log(`User ${socket.id} leaving previous room: ${socket.room}`);
       socket.leave(socket.room);
     }
 
     socket.join(roomName);
-    console.log("joining room ", roomName, typeof(room))
+    console.log("joining room ", roomName)
     socket.room = roomName;
 
     const roomSize = io.sockets.adapter.rooms.get(roomName)?.size || 0;
@@ -213,6 +221,8 @@ io.on("connection", (socket) => {
   socket.on("play_card", ({ gameId, selectedCard }) => {
     console.log("RUNNING play_card");
     console.log(gameSessions);
+    console.log(gameSessions[gameId]);
+    console.log(gameId);
     for (let player of gameSessions[gameId].players) {
       console.log(player);
     }
