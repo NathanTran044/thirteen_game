@@ -20,6 +20,8 @@ const io = new Server(server, {
 const CARDS_PER_PLAYER = 13;
 const ALL_CARDS = ["3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A", "2"]
   .flatMap((c) => ["S", "C", "D", "H"].map((s) => `${c}${s}`));
+// const ALL_CARDS = ["3", "3", "4", "4", "5", "5", "3", "4", "5", "2", "2", "2", "2"]
+//   .flatMap((c) => ["S", "C", "D", "H"].map((s) => `${c}${s}`));
 
 const gameSessions = {}; // Store game states
 const playerNames = {}; // Store player names
@@ -259,6 +261,16 @@ io.on("connection", (socket) => {
   
     // Split the cards
     const cards = selectedCard.split(" ").sort(cardSort);
+
+    // Win if all cards are 2 or douple-trips
+    if (
+      cards.length === 4 && cards.every(card => card.slice(0, -1) === "2") ||
+      validDoubleStraight(cards)
+    ) {
+      io.to(game.room).emit("game_over", { winner: playerNames[socket.id] });
+      delete gameSessions[gameId];
+      return;
+    }
     
     // Check if its open play
     if (game.lastPlayedIndex == game.currentPlayerIndex) {
