@@ -22,6 +22,7 @@ const ALL_CARDS = ["3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A", 
   .flatMap((c) => ["S", "C", "D", "H"].map((s) => `${c}${s}`));
 
 const gameSessions = {}; // Store game states
+const playerNames = {}; // Store player names
 
 const cardSort = (a, b) => {
   const ranks = ["3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A", "2"];
@@ -119,7 +120,7 @@ io.on("connection", (socket) => {
     console.log(`Received event: ${event}`, args);
   });
 
-  socket.on("join_room", (room, callback) => {
+  socket.on("join_room", ({ username, room }, callback) => {
     const roomName = String(room);
 
     if (socket.room) {
@@ -133,6 +134,8 @@ io.on("connection", (socket) => {
 
     const roomSize = io.sockets.adapter.rooms.get(roomName)?.size || 0;
     console.log(`User ${socket.id} joined room: ${roomName}, Total users: ${roomSize}`);
+
+    playerNames[socket.id] = username;
 
     const gameId = uuidv4();
     io.to(roomName).emit("room_info_update", { roomSize, gameId });
@@ -193,9 +196,10 @@ io.on("connection", (socket) => {
 
     // Emit begin game and game state update to only players in the room
     io.to(room).emit("begin_game");
+
     io.to(room).emit("game_state_update", {
       gameId,
-      current_turn: gameSessions[gameId].players[firstPlayerIndex].id,
+      currentTurn: playerNames[gameSessions[gameId].players[gameSessions[gameId].currentPlayerIndex].id],
     });
 
     io.sockets.adapter.rooms.get(room).forEach((socketId) => {
@@ -227,19 +231,6 @@ io.on("connection", (socket) => {
       return;
     }
 
-    // Check if player already skipped
-    console.log("Checking if skipped " + String(currentPlayer.skipped))
-    // if (currentPlayer.skipped) {
-    //   console.log("Player already skipped this round");
-    //   game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
-  
-    //   io.to(game.room).emit("game_state_update", {
-    //     gameId,
-    //     current_turn: game.players[game.currentPlayerIndex].id,
-    //   });
-    //   return;
-    // }
-
     // Check if player plays nothing
     if (selectedCard == "") {
       socket.emit("invalid_move", { message: "Must play a card or pass" });
@@ -253,16 +244,21 @@ io.on("connection", (socket) => {
       do {
         game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
       } while (game.players[game.currentPlayerIndex].skipped);
+
+      if (game.lastPlayedIndex == game.currentPlayerIndex) {
+        game.lastPlayedCard = ""
+      }
   
       io.to(game.room).emit("game_state_update", {
         gameId,
-        current_turn: game.players[game.currentPlayerIndex].id,
+        currentTurn: playerNames[game.players[game.currentPlayerIndex].id],
+        lastPlayedCard: game.lastPlayedCard
       });
       return;
     }
   
     // Split the cards
-    const cards = selectedCard.split(" ");
+    const cards = selectedCard.split(" ").sort(cardSort);
     
     // Check if its open play
     if (game.lastPlayedIndex == game.currentPlayerIndex) {
@@ -354,7 +350,7 @@ io.on("connection", (socket) => {
   
     // Check if the player has won
     if (currentPlayer.hand.length === 0) {
-      io.to(game.room).emit("game_over", { winner: socket.id });
+      io.to(game.room).emit("game_over", { winner: playerNames[socket.id] });
       delete gameSessions[gameId];
       return;
     }
@@ -366,7 +362,8 @@ io.on("connection", (socket) => {
   
     io.to(game.room).emit("game_state_update", {
       gameId,
-      current_turn: game.players[game.currentPlayerIndex].id,
+      currentTurn: playerNames[game.players[game.currentPlayerIndex].id],
+      lastPlayedCard: game.lastPlayedCard
     });
 
     console.log("finished playing selectedCard");

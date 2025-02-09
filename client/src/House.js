@@ -12,7 +12,7 @@ function House({ socket }) {
   // Join Room
   const joinRoom = () => {
     if (username !== "" && room !== "") {
-      socket.emit("join_room", room, (success, updatedSize, id) => {
+      socket.emit("join_room", { username, room}, (success, updatedSize, id) => {
         if (success) {
           console.log(`${id} Successfully joined room: ${room}`);
           setRoomSize(updatedSize); // Update room size immediately
@@ -67,7 +67,10 @@ function House({ socket }) {
 
       <h3>Users in Room: {roomSize}</h3>
 
-      <GameLogic socket={socket} room={room} roomSize={roomSize} newGameId={gameId}/>
+      <div style={{ marginBottom: "20px" }}>
+        <GameLogic username={username} socket={socket} room={room} roomSize={roomSize} newGameId={gameId} />
+      </div>
+
 
       <div>
         <input

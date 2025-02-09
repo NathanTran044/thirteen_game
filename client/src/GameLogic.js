@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from "react";
 
-function GameLogic({ socket, room, roomSize, newGameId }) {
+function GameLogic({ username, socket, room, roomSize, newGameId }) {
   const [playerCards, setPlayerCards] = useState([]);
   const [gameId, setGameId] = useState(newGameId);
   const [gameStarted, setGameStarted] = useState(false);
   const [selectedCard, setSelectedCard] = useState("");
   const [currentTurn, setCurrentTurn] = useState(false);
+  const [lastPlayedCard, setLastPlayedCard] = useState("");
 
-  // Start Game: Calls Python backend
+  // Start Game
   const startGame = () => {
     if (roomSize >= 1 && roomSize <= 4) {
       socket.emit("start_game", { num_players: roomSize, room });
@@ -37,7 +38,8 @@ function GameLogic({ socket, room, roomSize, newGameId }) {
     socket.on("game_state_update", (data) => {
       console.log("Game state updated:", data);
       setGameId(data.gameId);
-      setCurrentTurn(data.current_turn);
+      setCurrentTurn(data.currentTurn);
+      setLastPlayedCard(data.lastPlayedCard);
     });
 
     socket.on("player_hand", (data) => {
@@ -51,8 +53,8 @@ function GameLogic({ socket, room, roomSize, newGameId }) {
   
     socket.on("game_over", (data) => {
       setPlayerCards([]);
-      alert(`Game over! Winner: ${data.winner}`);
       setGameStarted(false);
+      alert(`Game over! Winner: ${data.winner}`);
     });
 
     if (newGameId) {
@@ -74,15 +76,27 @@ function GameLogic({ socket, room, roomSize, newGameId }) {
       
       <button onClick={startGame}>Start Game</button>
 
-      {gameId && (
+      {/* {gameId && (
         <div>
           <h3>Game ID: {gameId}</h3>
         </div>
+      )} */}
+
+      {currentTurn && (
+        <div>
+          <h1>{currentTurn}'s turn</h1>
+        </div>
       )}
+
+      <div>
+        <h2>
+          {lastPlayedCard ? `Last Played Card: ${lastPlayedCard}` : "Play anything"}
+        </h2>
+      </div>
 
       {playerCards.length > 0 && (
         <div>
-          <p>{playerCards.join(", ")}</p>
+          <p>{playerCards.join(" ")}</p>
         </div>
       )}
 
