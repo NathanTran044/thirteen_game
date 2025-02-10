@@ -50,11 +50,18 @@ function GameLogic({ username, socket, room, roomSize, newGameId }) {
     socket.on("invalid_move", (data) => {
       alert(data.message);
     });
+
+    socket.on("player_finished", (data) => {
+      // setPlayerCards([]);
+      // setGameStarted(false);
+      alert(`Player ${data.finished} has finished`);
+    });
+
   
     socket.on("game_over", (data) => {
-      setPlayerCards([]);
-      setGameStarted(false);
-      alert(`Game over! Winner: ${data.winner}`);
+      // setPlayerCards([]);
+      // setGameStarted(false);
+      alert(`Game over! Last Place: ${data.finished}`);
     });
 
     if (newGameId) {
@@ -66,6 +73,7 @@ function GameLogic({ username, socket, room, roomSize, newGameId }) {
       socket.off("game_state_update");
       socket.off("player_hand");
       socket.off("invalid_move");
+      socket.off("player_finished");
       socket.off("game_over");
     };
   }, [newGameId]);

@@ -20,7 +20,7 @@ const io = new Server(server, {
 const CARDS_PER_PLAYER = 13;
 const ALL_CARDS = ["3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A", "2"]
   .flatMap((c) => ["S", "C", "D", "H"].map((s) => `${c}${s}`));
-// const ALL_CARDS = ["3", "3", "4", "4", "5", "5", "6", "6", "7", "7", "2", "2", "2"]
+// const ALL_CARDS = ["3", "3", "4", "4", "5", "5", "6", "2", "2", "2", "2", "2", "2"]
 //   .flatMap((c) => ["S", "C", "D", "H"].map((s) => `${c}${s}`));
 
 const gameSessions = {}; // Store game states
@@ -193,7 +193,8 @@ io.on("connection", (socket) => {
         id: socketId,
         hand: player_cards[index],
         isTurn: false,
-        skipped: false
+        skipped: false,
+        finished: false
       });
 
       io.to(socketId).emit("player_hand", player_cards[index]);
@@ -253,9 +254,29 @@ io.on("connection", (socket) => {
     if (selectedCard == "pass") {
       currentPlayer.skipped = true;
 
+      // Check if all active players passed, only happens after a player has finished and all next players pass leading to free turn
+      const activePlayers = game.players.filter(p => !p.finished);
+      let allPassed = false;
+      if (activePlayers.every(p => p.skipped)) {
+        console.log("All active players skipped. Resetting round...");
+
+        // Move index to player who finished
+        game.currentPlayerIndex = game.lastPlayedIndex;
+        game.lastPlayedCard = "";
+        
+        // Reset skips for the next round
+        activePlayers.forEach(p => (p.skipped = false));
+        allPassed = true;
+      }
+
       do {
         game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
-      } while (game.players[game.currentPlayerIndex].skipped);
+      } while (game.players[game.currentPlayerIndex].skipped || game.players[game.currentPlayerIndex].finished);
+
+      // need to let next player play any card if everone passed
+      if (allPassed) {
+        game.lastPlayedIndex = game.currentPlayerIndex;
+      }
 
       if (game.lastPlayedIndex == game.currentPlayerIndex) {
         game.lastPlayedCard = ""
@@ -276,13 +297,17 @@ io.on("connection", (socket) => {
     if (
       cards.length === 4 && cards.every(card => card.slice(0, -1) === "2")
     ) {
-      io.to(game.room).emit("game_over", { winner: playerNames[socket.id] });
-      delete gameSessions[gameId];
-      return;
+      currentPlayer.finished = true;
+      io.to(game.room).emit("player_finished", { finished: playerNames[socket.id] });
+
+      if (game.players.filter(p => !p.finished).length === 1) {
+        const lastPlayer = game.players.find(p => !p.finished);
+        io.to(game.room).emit("game_over", { finished: playerNames[lastPlayer.id] });
+        delete gameSessions[gameId];
+        return;
+      }
     }
-    
-    // Check if its open play
-    if (game.lastPlayedIndex == game.currentPlayerIndex) {
+    else if (game.lastPlayedIndex == game.currentPlayerIndex) { // Check if its open play
       console.log("Free to play!");
       // Reset all skips
       for (let player of game.players) {
@@ -377,15 +402,22 @@ io.on("connection", (socket) => {
   
     // Check if the player has won
     if (currentPlayer.hand.length === 0) {
-      io.to(game.room).emit("game_over", { winner: playerNames[socket.id] });
-      delete gameSessions[gameId];
-      return;
+      currentPlayer.finished = true;
+      io.to(game.room).emit("player_finished", { finished: playerNames[socket.id] });
+      
+      // Check if only one player remains
+      if (game.players.filter(p => !p.finished).length === 1) {
+        const lastPlayer = game.players.find(p => !p.finished);
+        io.to(game.room).emit("game_over", { finished: playerNames[lastPlayer.id] });
+        delete gameSessions[gameId];
+        return;
+      }
     }
   
     // Move to next player
     do {
       game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
-    } while (game.players[game.currentPlayerIndex].skipped);
+    } while (game.players[game.currentPlayerIndex].skipped || game.players[game.currentPlayerIndex].finished);
   
     io.to(game.room).emit("game_state_update", {
       gameId,
