@@ -1,7 +1,8 @@
-import './App.css';
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import House from "./House";
+import "./App.css";
+import React from "react";
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
+import House from "./components/House";
+import GameRoom from "./components/GameRoom";
 import io from "socket.io-client";
 
 const socket = io.connect("http://localhost:3001");
@@ -9,23 +10,34 @@ const socket = io.connect("http://localhost:3001");
 function App() {
   return (
     <Router>
-      <div className="App">
+      <MainLayout>
+        <Routes>
+          <Route path="/" element={<h3>Welcome to the Card Game!</h3>} />
+          <Route path="/house" element={<House socket={socket} />} />
+          <Route path="/game" element={<GameRoom socket={socket} />} />
+        </Routes>
+      </MainLayout>
+    </Router>
+  );
+}
+
+// Layout component to conditionally hide the navbar
+function MainLayout({ children }) {
+  const location = useLocation();
+
+  return (
+    <div className="App">
+      {/* Show the navbar only if NOT on /game */}
+      {location.pathname !== "/game" && (
         <header className="App-header">
           <h1>Card Game</h1>
           <nav>
-            <Link to="/house">House</Link> | 
-            {/* <Link to="/leaderboard">Leaderboard</Link> | 
-            <Link to="/">Home</Link> */}
+            <Link to="/">Home</Link> | <Link to="/house">House</Link>
           </nav>
         </header>
-
-        <Routes>
-          <Route path="/house" element={<House socket={socket} />} />
-          {/* <Route path="/leaderboard" element={<h3>Leaderboard Page</h3>} />
-          <Route path="/" element={<h3>Home Page</h3>} /> */}
-        </Routes>
-      </div>
-    </Router>
+      )}
+      {children}
+    </div>
   );
 }
 
