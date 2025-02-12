@@ -29,7 +29,7 @@ function GameRoom({ socket }) {
   const disconnect = () => {
     console.log("Disconnecting");
     socket.emit("leave_room");
-    navigate("/house");
+    navigate("/lobby");
   }
 
   useEffect(() => {
@@ -62,14 +62,14 @@ function GameRoom({ socket }) {
 
   
     socket.on("game_over", (data) => {
-      // setPlayerCards([]);
+      setPlayerCards([]);
       // setGameStarted(false);
       alert(`Game over! Last Place: ${data.finished}`);
     });
 
     socket.on("force_disconnect", () => {
       socket.emit("leave_room");
-      navigate("/house");
+      navigate("/lobby");
     })
 
     return () => {
@@ -88,6 +88,7 @@ function GameRoom({ socket }) {
     <div>
       <h2>Game Room: {room}</h2>
       <h3>Players in Room: {roomSize}</h3>
+      <h3>Player: {username}</h3>
       <h3>{currentTurn}'s turn</h3>
       <h3>Last Played Card: {lastPlayedCard || "Play any card"}</h3>
 

@@ -1,7 +1,7 @@
 import "./App.css";
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from "react-router-dom";
-import House from "./components/House";
+import Lobby from "./components/Lobby";
 import GameRoom from "./components/GameRoom";
 import io from "socket.io-client";
 
@@ -13,7 +13,7 @@ function App() {
       <MainLayout>
         <Routes>
           <Route path="/" element={<h3>Welcome to the Card Game!</h3>} />
-          <Route path="/house" element={<House socket={socket} />} />
+          <Route path="/lobby" element={<Lobby socket={socket} />} />
           <Route path="/game" element={<GameRoom socket={socket} />} />
         </Routes>
       </MainLayout>
@@ -32,7 +32,7 @@ function MainLayout({ children }) {
         <header className="App-header">
           <h1>Card Game</h1>
           <nav>
-            <Link to="/">Home</Link> | <Link to="/house">House</Link>
+            <Link to="/">Home</Link> | <Link to="/lobby">Lobby</Link>
           </nav>
         </header>
       )}
