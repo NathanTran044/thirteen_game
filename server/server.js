@@ -135,6 +135,23 @@ io.on("connection", (socket) => {
 
     if (socket.room) {
       console.log(`User ${socket.id} leaving previous room: ${socket.room}`);
+      let roomSize = io.sockets.adapter.rooms.get(socket.room)?.size || 0;
+      roomSize = roomSize - 1;
+
+      // update old room's size
+      const gameId = uuidv4();
+      io.to(socket.room).emit("room_info_update", { roomSize, gameId });
+
+      // game in empty room needs to be stopped
+      if (roomSize == 0) {
+        for (let gameId in gameSessions) {
+          let game = gameSessions[gameId]; // Get the game session object
+          if (game.room == socket.room) {
+            delete gameSessions[gameId];
+            break;
+          }
+        }
+      }
       socket.leave(socket.room);
     }
 
@@ -431,14 +448,24 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log(`User Disconnected: ${socket.id}`);
     if (socket.room) {
-      const room = socket.room;
-      socket.leave(room);
+      let roomSize = io.sockets.adapter.rooms.get(socket.room)?.size || 0;
+      roomSize = roomSize - 1;
 
-      const roomSize = io.sockets.adapter.rooms.get(room)?.size || 0;
-      if (roomSize > 0) {
-        const gameId = uuidv4();
-        io.to(room).emit("room_info_update", { roomSize, gameId });
+      // update old room's size
+      const gameId = uuidv4();
+      io.to(socket.room).emit("room_info_update", { roomSize, gameId });
+
+      // game in empty room needs to be stopped
+      if (roomSize == 0) {
+        for (let gameId in gameSessions) {
+          let game = gameSessions[gameId]; // Get the game session object
+          if (game.room == socket.room) {
+            delete gameSessions[gameId];
+            break;
+          }
+        }
       }
+      socket.leave(socket.room);
     }
   });
 });
