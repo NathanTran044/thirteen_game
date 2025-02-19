@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
+import "./Lobby.css";
 
-function House({ socket }) {
+function Lobby({ socket }) {
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
   const [roomSize, setRoomSize] = useState(0);
@@ -14,7 +15,6 @@ function House({ socket }) {
       socket.emit("join_room", { username, room }, (success, updatedSize, id) => {
         if (success) {
           console.log(`${id} Successfully joined room: ${room}`);
-          setRoomSize(updatedSize); 
           setGameId(id);
         } else {
           alert(`Failed to join room: ${room}`);
@@ -45,7 +45,7 @@ function House({ socket }) {
 
     socket.on("begin_game", () => {
       console.log("Game begin");
-      console.log("sending this data: ",  { username, room, roomSize, gameId })
+      console.log("sending this data: ",  { username, room, roomSize, gameId });
       navigate("/game", { state: { username, room, roomSize, gameId } });
     });
 
@@ -57,26 +57,41 @@ function House({ socket }) {
   }, [socket, username, room, roomSize, gameId, navigate]);
 
   return (
-    <div>
-      <h3>Join a Game Room</h3>
-      
-      <input
-        type="text"
-        placeholder="Username"
-        onChange={(event) => setUsername(event.target.value)}
-      />
-      <input
-        type="text"
-        placeholder="Room ID"
-        onChange={(event) => setRoom(event.target.value)}
-      />
-      <button onClick={joinRoom}>Join Room</button>
-
-      <h3>Users in Room: {roomSize}</h3>
-
-      {roomSize > 0 && <button onClick={startGame}>Start Game</button>}
+    <div className="lobby-container">
+      <div className="lobby-box">
+        <div className="content-wrapper">
+          <h1>Join Room</h1>
+          <div className="input-group">
+            <input
+              type="text"
+              className="input-field"
+              placeholder="Username"
+              onChange={(event) => setUsername(event.target.value)}
+            />
+            <input
+              type="text"
+              className="input-field"
+              placeholder="Room ID"
+              onChange={(event) => setRoom(event.target.value)}
+            />
+          </div>
+          <button className="join-button" onClick={joinRoom}>
+            JOIN ROOM
+          </button>
+          {roomSize > 0 && (
+            <div className="game-status">
+              <div className="player-count">
+                Players in Room: {roomSize}/4
+              </div>
+              <button className="start-button" onClick={startGame}>
+                START GAME
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
 
-export default House;
+export default Lobby;
