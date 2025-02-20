@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Chat from "./Chat";
+import './GameRoom.css';
 
 function GameRoom({ socket }) {
   const location = useLocation();
@@ -14,10 +14,65 @@ function GameRoom({ socket }) {
   const [selectedCard, setSelectedCard] = useState("");
   const [currentTurn, setCurrentTurn] = useState("");
   const [lastPlayedCard, setLastPlayedCard] = useState("");
+  const [players, setPlayers] = useState([]);
+  
+
+  const getPlayerPositions = () => {
+    switch (roomSize) {
+      case 2:
+        return ['bottom', 'top'];
+      case 3:
+        return ['bottom', 'left', 'right'];
+      case 4:
+        return ['bottom', 'left', 'top', 'right'];
+      default:
+        return ['bottom'];
+    }
+  };
+
+  const PlayerAvatar = ({ name }) => (
+    <div className="player-avatar">
+      <div className="avatar-circle">{name[0]}</div>
+      <div className="player-name">{name}</div>
+    </div>
+  );
+
+  // Modified to handle multiple card selection
+  const handleCardClick = (card) => {
+    setSelectedCard(prev => {
+      if (prev.includes(card)) {
+        return prev.filter(c => c !== card);
+      } else {
+        return [...prev, card];
+      }
+    });
+  };
+
+  const Card = ({ card, isSelectable = true, isSelected = false, faceDown = false }) => (
+    <div 
+      className={`playing-card ${isSelectable ? 'selectable' : ''} 
+        ${isSelected ? 'selected' : ''} ${faceDown ? 'face-down' : ''}`}
+      onClick={() => isSelectable && handleCardClick(card)}
+    >
+      {!faceDown && card}
+    </div>
+  );
+
+  const PlayerPosition = ({ position, playerName, cardCount = 0 }) => (
+    <div className={`player ${position}`}>
+      <PlayerAvatar name={playerName} />
+      <div className={`card-stack ${position === 'left' || position === 'right' ? 'vertical' : ''}`}>
+        {[...Array(cardCount)].map((_, i) => (
+          <Card key={i} faceDown={true} isSelectable={false} />
+        ))}
+      </div>
+    </div>
+  );
 
   const playCard = () => {
-    console.log("GameId and Card played: " + gameId + " " + selectedCard);
-    socket.emit("play_card", { gameId, selectedCard });
+    const selectedCardString = selectedCard.join(' ');
+    console.log("GameId and Card played: " + gameId + " " + selectedCardString);
+    socket.emit("play_card", { gameId, selectedCard: selectedCardString });
     setSelectedCard("")
   };
 
@@ -29,7 +84,7 @@ function GameRoom({ socket }) {
   const disconnect = () => {
     console.log("Disconnecting");
     socket.emit("leave_room");
-    navigate("/lobby");
+    navigate("/");
   }
 
   useEffect(() => {
@@ -69,7 +124,7 @@ function GameRoom({ socket }) {
 
     socket.on("force_disconnect", () => {
       socket.emit("leave_room");
-      navigate("/lobby");
+      navigate("/");
     })
 
     return () => {
@@ -85,33 +140,64 @@ function GameRoom({ socket }) {
   }, [socket]);
 
   return (
-    <div>
-      <h2>Game Room: {room}</h2>
-      <h3>Players in Room: {roomSize}</h3>
-      <h3>Player: {username}</h3>
-      <h3>{currentTurn}'s turn</h3>
-      <h3>Last Played Card: {lastPlayedCard || "Play any card"}</h3>
+    <div className="game-room">
+      <div className="game-header">
+        <h2>Game Room: {room}</h2>
+        <button className="leave-button" onClick={disconnect}>Leave Game</button>
+      </div>
 
-      {playerCards.length > 0 && (
-        <div>
-          <p>Your Hand: {playerCards.join(" ")}</p>
+      <div className="game-table">
+        {getPlayerPositions().map((position, index) => {
+          if (position === 'bottom') return null;
+          return (
+            <PlayerPosition
+              key={position}
+              position={position}
+              playerName={`Player ${index + 1}`}
+              cardCount={13}
+            />
+          )}
+        )}
+
+        <div className="center-area">
+          <div className="pile">
+          {lastPlayedCard && 
+            lastPlayedCard.split(" ").map((card, index) => (
+              <Card key={index} card={card} isSelectable={false} />
+            ))
+          }
+          </div>
         </div>
-      )}
 
-      <input
-        type="text"
-        placeholder="Enter card"
-        value={selectedCard}
-        onChange={(e) => setSelectedCard(e.target.value)}
-      />
-      <button onClick={playCard}>Play Card</button>
-      <button onClick={passTurn}>Pass</button>
-
-      <button onClick={disconnect}>Disconnect</button>
-
-      <Chat socket={socket} room={room} username={username} />
+        <div className="player-hand">
+          <div className="cards">
+            {playerCards.map((card, index) => (
+              <Card
+                key={index}
+                card={card}
+                isSelected={selectedCard.includes(card)}
+              />
+            ))}
+          </div>
+          <div className="controls">
+            <button 
+              className="play-button"
+              onClick={playCard}
+              disabled={selectedCard.length === 0}
+            >
+              Play
+            </button>
+            <button 
+              className="pass-button"
+              onClick={passTurn}
+            >
+              Pass
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
-
+// <Chat socket={socket} room={room} username={username} />
 export default GameRoom;

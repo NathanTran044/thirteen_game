@@ -76,7 +76,7 @@ function Lobby({ socket }) {
             />
           </div>
           <button className="join-button" onClick={joinRoom}>
-            JOIN ROOM
+            JOIN
           </button>
           {roomSize > 0 && (
             <div className="game-status">

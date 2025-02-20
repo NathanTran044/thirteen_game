@@ -16,7 +16,7 @@
   position: relative;
   width: 100%;
   max-width: 360px;
-  background-color: rgba(255, 251, 245, 0.6);
+  background-color: rgba(255, 251, 245, 0.85);
   backdrop-filter: blur(4px);
   border-radius: 14px;
   box-shadow: 
@@ -159,7 +159,7 @@ h1 {
 }
 
 .start-button {
-  background-color: rgb(90, 146, 143);
+  background-color: rgb(24, 49, 49);
   color: white;
   box-shadow: 
     0 2px 4px rgba(0, 0, 0, 0.1),
@@ -167,7 +167,7 @@ h1 {
 }
 
 .start-button:hover {
-  background-color: rgb(110, 140, 138);
+  background-color: rgb(50, 93, 91);
   transform: translateY(-1px);
   box-shadow: 
     0 4px 8px rgba(0, 0, 0, 0.15),

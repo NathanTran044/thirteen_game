@@ -1,0 +1,251 @@
+.game-room {
+  width: 100%;
+  height: 100vh;
+  background-color: #0a6b0a;
+  padding: 20px;
+  color: white;
+  overflow: hidden;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  height: 50px;
+}
+
+.leave-button {
+  background-color: #d32f2f;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.game-table {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) minmax(300px, 3fr) minmax(100px, 1fr);
+  grid-template-rows: minmax(120px, 1fr) minmax(200px, 2fr) minmax(150px, 1fr);
+  gap: 10px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+}
+
+.player-avatar {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+.avatar-circle {
+  width: 30px;
+  height: 30px;
+  background-color: #fff;
+  color: #0a6b0a;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.player-name {
+  font-size: 12px;
+}
+
+.card-stack {
+  position: relative;
+  display: flex;
+  gap: 1px;
+}
+
+.card-stack.vertical {
+  flex-direction: column;
+}
+
+.card-stack .playing-card:not(:first-child) {
+  margin-left: -40px;
+}
+
+.card-stack.vertical .playing-card:not(:first-child) {
+  margin-left: 0;
+  margin-top: -70px;
+}
+
+.playing-card {
+  width: 50px;
+  height: 75px;
+  background-color: white;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: black;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  cursor: pointer;
+  transition: transform 0.2s, margin 0.2s;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.playing-card.face-down {
+  background-image: linear-gradient(45deg, #b71c1c 25%, transparent 25%),
+                    linear-gradient(-45deg, #b71c1c 25%, transparent 25%),
+                    linear-gradient(45deg, transparent 75%, #b71c1c 75%),
+                    linear-gradient(-45deg, transparent 75%, #b71c1c 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+}
+
+.playing-card.selectable:hover {
+  transform: translateY(-10px);
+  z-index: 2;
+}
+
+.playing-card.selected {
+  transform: translateY(-10px);
+  box-shadow: 0 0 0 2px #2196f3;
+  z-index: 1;
+}
+
+.center-area {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pile {
+    display: flex;
+    gap: 8px; /* Adjust spacing between cards */
+    justify-content: center; /* Center the cards */
+    align-items: center;
+    margin-top: 10px; /* Adjust spacing if needed */
+  }
+
+.message-box {
+  background-color: rgba(255, 255, 0, 0.9);
+  color: black;
+  padding: 8px 16px;
+  border-radius: 4px;
+  text-align: center;
+  max-width: 90%;
+  word-wrap: break-word;
+}
+
+.player-hand {
+  grid-column: 2;
+  grid-row: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.cards {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  min-height: 100px;
+  width: 100%;
+  padding: 0 20px;
+}
+
+/* Improved card spacing in player's hand */
+.cards .playing-card {
+  margin-right: 5px; /* Overlap cards */
+  transition: margin 0.2s ease, transform 0.2s ease;
+}
+
+/* .cards .playing-card:last-child {
+  margin-right: 0;
+} */
+
+/* Spread cards apart on hover */
+.cards:hover .playing-card {
+  margin-right: 5px;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.play-button, .pass-button {
+  padding: 6px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.play-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.play-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.pass-button {
+  background-color: #f44336;
+  color: white;
+}
+
+/* Player positions */
+.player.top {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.player.left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.player.right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+.player.bottom {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+@media (max-width: 768px) {
+  .game-table {
+    grid-template-columns: minmax(80px, 1fr) minmax(200px, 3fr) minmax(80px, 1fr);
+  }
+
+  .playing-card {
+    width: 40px;
+    height: 60px;
+    font-size: 12px;
+  }
+
+  .cards .playing-card {
+    margin-right: -20px;
+  }
+}

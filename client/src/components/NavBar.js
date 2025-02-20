@@ -13,7 +13,7 @@ function Navbar() {
     <header className="App-header">
       <h1>Thirteen</h1>
       <nav>
-        <Link to="/lobby" className={isActive("/") ? "active" : ""}>
+        <Link to="/" className={isActive("/") ? "active" : ""}>
           Lobby
         </Link>
       </nav>
