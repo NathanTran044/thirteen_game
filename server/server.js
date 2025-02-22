@@ -214,7 +214,13 @@ io.on("connection", (socket) => {
     io.to(room).emit("game_state_update", {
       gameId,
       currentTurn: playerNames[gameSessions[gameId].players[gameSessions[gameId].currentPlayerIndex].id],
+      players: gameSessions[gameId].players.map(player => ({
+        username: playerNames[player.id],
+        cardCount: player.hand.length
+      }))
     });
+
+    console.log("current player is " + playerNames[gameSessions[gameId].players[gameSessions[gameId].currentPlayerIndex].id]);
 
     io.sockets.adapter.rooms.get(room).forEach((socketId) => {
       console.log(`Sent game_state_update to socket: ${socketId}`);
@@ -239,7 +245,6 @@ io.on("connection", (socket) => {
   
     let game = gameSessions[gameId];
     let currentPlayer = game.players[game.currentPlayerIndex];
-    console.log("current player is " + String(currentPlayer.id))
   
     if (socket.id !== currentPlayer.id) {
       console.log("Not player's turn");
@@ -284,12 +289,21 @@ io.on("connection", (socket) => {
       if (game.lastPlayedIndex == game.currentPlayerIndex) {
         game.lastPlayedCard = ""
       }
+      
+      io.to(game.room).emit("player_passed", {
+        playerName: playerNames[currentPlayer.id]
+      });
   
       io.to(game.room).emit("game_state_update", {
         gameId,
         currentTurn: playerNames[game.players[game.currentPlayerIndex].id],
-        lastPlayedCard: game.lastPlayedCard
+        lastPlayedCard: game.lastPlayedCard,
+        players: game.players.map(player => ({
+          username: playerNames[player.id],
+          cardCount: player.hand.length
+        }))
       });
+
       return;
     }
   
@@ -425,8 +439,14 @@ io.on("connection", (socket) => {
     io.to(game.room).emit("game_state_update", {
       gameId,
       currentTurn: playerNames[game.players[game.currentPlayerIndex].id],
-      lastPlayedCard: game.lastPlayedCard
+      lastPlayedCard: game.lastPlayedCard,
+      players: game.players.map(player => ({
+        username: playerNames[player.id],
+        cardCount: player.hand.length
+      }))
     });
+
+    console.log("current player is " + playerNames[game.players[game.currentPlayerIndex].id])
 
     console.log("finished playing selectedCard");
   });
