@@ -133,6 +133,13 @@ io.on("connection", (socket) => {
       }
     }
 
+    const sizeBefore = io.sockets.adapter.rooms.get(roomName)?.size || 0
+    if (sizeBefore == 4) {
+      socket.emit("invalid_move", { message: "Cannot join room. Room is full." });
+        return;
+    }
+
+
     socket.join(roomName);
     console.log("joining room ", roomName)
     socket.room = roomName;

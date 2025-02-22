@@ -5,7 +5,7 @@
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-image: url('../images/lobby-background.jpg');
+  background-image: url('/public/images/lobby-background.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -23,6 +23,7 @@
     0 10px 30px rgba(0, 0, 0, 0.15),
     0 0 0 1px rgba(90, 146, 143, 0.1);
   padding: 1.5rem;
+  margin-bottom: 20vh;
 }
 
 /* Decorative border */

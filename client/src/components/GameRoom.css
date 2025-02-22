@@ -30,24 +30,55 @@
 .game-table {
   flex: 1;
   display: grid;
-  grid-template-columns: minmax(100px, 1fr) minmax(300px, 3fr) minmax(100px, 1fr);
-  grid-template-rows: minmax(120px, 1fr) minmax(200px, 2fr) minmax(150px, 1fr);
+  grid-template-columns: minmax(150px, 1fr) auto minmax(150px, 1fr);
+  grid-template-rows: minmax(70px, 0.2fr)  minmax(200px, 2fr) minmax(180px, 1.3fr);
   gap: 10px;
-  max-width: 1200px;
+  max-width: 90vw;
   margin: 0 auto;
   width: 100%;
 }
 
 .player {
   display: flex;
-  flex-direction: column;
   align-items: center;
   padding: 10px;
+  position: relative;
 }
 
+.player.left {
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.player.left .player-avatar {
+  order: -1; /* Moves avatar before the card stack */
+  margin-right: 10px;
+}
+
+.player.right {
+  flex-direction: row;
+  justify-content: flex-end;
+}
+
+.player.right .player-avatar {
+  order: 1; /* Moves avatar after the card stack */
+  margin-left: 10px;
+}
+
+.player.top {
+  flex-direction: column-reverse; /* Flips order: Avatar above cards */
+  align-items: center;
+  margin-top: 90px;
+}
+
+.player.top .player-avatar {
+  margin-bottom: 10px;
+}
+
+/* Player avatar styles */
 .player-avatar {
   text-align: center;
-  margin-bottom: 5px;
+  z-index: 1;
 }
 
 .avatar-circle {
@@ -60,56 +91,63 @@
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  margin-bottom: 5px;
 }
 
 .player-name {
   font-size: 12px;
 }
 
+/* Card stack styles */
 .card-stack {
   position: relative;
   display: flex;
   gap: 1px;
+  padding: 10px;
+  border-radius: 8px;
 }
 
-.card-stack.vertical {
+/* Vertical card stack for left and right players */
+.player.left .card-stack,
+.player.right .card-stack {
   flex-direction: column;
 }
 
-.card-stack .playing-card:not(:first-child) {
-  margin-left: -40px;
+.player.left .playing-card,
+.player.right .playing-card {
+  transform: rotate(90deg);
 }
 
-.card-stack.vertical .playing-card:not(:first-child) {
-  margin-left: 0;
-  margin-top: -70px;
-}
-
+/* Card styles */
 .playing-card {
-  width: 50px;
-  height: 75px;
-  background-color: white;
+  width: 66px;
+  height: 88px;
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: black;
-  font-weight: bold;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   cursor: pointer;
   transition: transform 0.2s, margin 0.2s;
   flex-shrink: 0;
   position: relative;
+  overflow: hidden;
 }
 
-.playing-card.face-down {
-  background-image: linear-gradient(45deg, #b71c1c 25%, transparent 25%),
-                    linear-gradient(-45deg, #b71c1c 25%, transparent 25%),
-                    linear-gradient(45deg, transparent 75%, #b71c1c 75%),
-                    linear-gradient(-45deg, transparent 75%, #b71c1c 75%);
-  background-size: 20px 20px;
-  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.card-stack .playing-card:not(:first-child) {
+  margin-left: -45px;
+}
+
+/* Vertical stacking for side players */
+.player.left .card-stack .playing-card:not(:first-child),
+.player.right .card-stack .playing-card:not(:first-child) {
+  margin-left: 0;
+  margin-top: -70px;
 }
 
 .playing-card.selectable:hover {
@@ -123,6 +161,7 @@
   z-index: 1;
 }
 
+/* Center area styles */
 .center-area {
   grid-column: 2;
   grid-row: 2;
@@ -134,23 +173,19 @@
 }
 
 .pile {
-    display: flex;
-    gap: 8px; /* Adjust spacing between cards */
-    justify-content: center; /* Center the cards */
-    align-items: center;
-    margin-top: 10px; /* Adjust spacing if needed */
-  }
-
-.message-box {
-  background-color: rgba(255, 255, 0, 0.9);
-  color: black;
-  padding: 8px 16px;
-  border-radius: 4px;
-  text-align: center;
-  max-width: 90%;
-  word-wrap: break-word;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 10px;
 }
 
+.pile .playing-card {
+  margin-left: -40px;
+  transform: translateX(30%);
+}
+
+/* Player hand styles */
 .player-hand {
   grid-column: 2;
   grid-row: 3;
@@ -169,21 +204,16 @@
   padding: 0 20px;
 }
 
-/* Improved card spacing in player's hand */
 .cards .playing-card {
-  margin-right: 5px; /* Overlap cards */
+  margin-right: -30px;
   transition: margin 0.2s ease, transform 0.2s ease;
 }
 
-/* .cards .playing-card:last-child {
-  margin-right: 0;
-} */
-
-/* Spread cards apart on hover */
 .cards:hover .playing-card {
-  margin-right: 5px;
+  margin-right: -20px;
 }
 
+/* Control buttons */
 .controls {
   display: flex;
   gap: 10px;
@@ -234,18 +264,32 @@
   grid-row: 3;
 }
 
-@media (max-width: 768px) {
+/* Mobile responsiveness */
+@media (max-width:1068px) {
   .game-table {
     grid-template-columns: minmax(80px, 1fr) minmax(200px, 3fr) minmax(80px, 1fr);
   }
 
   .playing-card {
-    width: 40px;
-    height: 60px;
-    font-size: 12px;
+    width: 53px;
+    height: 72px;
   }
 
   .cards .playing-card {
-    margin-right: -20px;
+    margin-right: -25px;
+  }
+
+  .cards:hover .playing-card {
+    margin-right: -18px;
+  }
+  
+  .card-stack .playing-card:not(:first-child) {
+    margin-left: -35px;
+  }
+
+  /* Adjust vertical stacking for mobile */
+  .player.left .card-stack .playing-card:not(:first-child),
+  .player.right .card-stack .playing-card:not(:first-child) {
+    margin-top: -55px;
   }
 }

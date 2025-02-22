@@ -48,26 +48,61 @@ function GameRoom({ socket }) {
     });
   };
 
+  const getCardImage = (card) => {
+    if (!card) return 'cardBack.png';
+    
+    // Convert card notation to image filename
+    const rankMap = {
+      '3': '3', '4': '4', '5': '5', '6': '6', '7': '7', '8': '8', '9': '9',
+      '10': '10', 'J': 'J', 'Q': 'Q', 'K': 'K', 'A': 'A', '2': '2'
+    };
+
+    const suitMap = {
+      'C': 'Clubs',
+      'D': 'Diamonds',
+      'H': 'Hearts',
+      'S': 'Spades'
+    };
+
+    const rank = card.slice(0, -1);
+    const suit = card.slice(-1);
+    
+    return `card${suitMap[suit]}${rankMap[rank]}.png`;
+  };
+
   const Card = ({ card, isSelectable = true, isSelected = false, faceDown = false }) => (
     <div 
       className={`playing-card ${isSelectable ? 'selectable' : ''} 
-        ${isSelected ? 'selected' : ''} ${faceDown ? 'face-down' : ''}`}
+        ${isSelected ? 'selected' : ''}`}
       onClick={() => isSelectable && handleCardClick(card)}
     >
-      {!faceDown && card}
+      <img 
+        // src={`../images/cards/${faceDown ? 'cardBack.png' : getCardImage(card)}`} 
+        src={`/images/cards/${faceDown ? 'cardBack.png' : getCardImage(card)}`} 
+        alt={faceDown ? 'Card back' : card}
+        className="card-image"
+      />
     </div>
   );
 
-  const PlayerPosition = ({ position, playerName, cardCount = 0 }) => (
-    <div className={`player ${position}`}>
-      <PlayerAvatar name={playerName} />
-      <div className={`card-stack ${position === 'left' || position === 'right' ? 'vertical' : ''}`}>
-        {[...Array(cardCount)].map((_, i) => (
-          <Card key={i} faceDown={true} isSelectable={false} />
-        ))}
+  const PlayerPosition = ({ position, playerName, cardCount = 0 }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    
+    return (
+      <div 
+        className={`player ${position}`}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        <div className={`card-stack ${position === 'left' || position === 'right' ? 'horizontal' : ''} ${isHovered ? 'expanded' : ''}`}>
+          {[...Array(cardCount)].map((_, i) => (
+            <Card key={i} faceDown={true} isSelectable={false} />
+          ))}
+        </div>
+        <PlayerAvatar name={playerName} />
       </div>
-    </div>
-  );
+    );
+  };
 
   const playCard = () => {
     const selectedCardString = selectedCard.join(' ');
