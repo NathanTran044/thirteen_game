@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Chat from "./Chat";
 import './GameRoom.css';
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 function GameRoom({ socket }) {
   const location = useLocation();
@@ -133,6 +136,7 @@ function GameRoom({ socket }) {
       setGameId(data.gameId);
       setCurrentTurn(data.currentTurn);
       setLastPlayedCard(data.lastPlayedCard);
+      setPlayers(data.players);
     })
 
     socket.on("player_hand", (data) => {
@@ -141,20 +145,44 @@ function GameRoom({ socket }) {
     })
 
     socket.on("invalid_move", (data) => {
-      alert(data.message);
+      toast.error(data.message, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        pauseOnHover: false,
+        theme: "light",
+      });
     });
 
     socket.on("player_finished", (data) => {
       // setPlayerCards([]);
       // setGameStarted(false);
-      alert(`Player ${data.finished} has finished`);
+      toast.info(`${data.finished} has finished`, {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        pauseOnHover: false,
+        theme: "light",
+      });
     });
 
   
     socket.on("game_over", (data) => {
       setPlayerCards([]);
       // setGameStarted(false);
-      alert(`Game over! Last Place: ${data.finished}`);
+      toast.info(`Game over! Last Place: ${data.finished}`, {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        pauseOnHover: false,
+        theme: "light",
+      });
     });
 
     socket.on("force_disconnect", () => {
@@ -175,24 +203,28 @@ function GameRoom({ socket }) {
   }, [socket]);
 
   return (
+    
     <div className="game-room">
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
       <div className="game-header">
-        <h2>Game Room: {room}</h2>
+        <h2>{currentTurn}'s Turn</h2>
         <button className="leave-button" onClick={disconnect}>Leave Game</button>
       </div>
 
       <div className="game-table">
-        {getPlayerPositions().map((position, index) => {
-          if (position === 'bottom') return null;
-          return (
-            <PlayerPosition
-              key={position}
-              position={position}
-              playerName={`Player ${index + 1}`}
-              cardCount={13}
-            />
-          )}
-        )}
+        {players && players
+          .filter(player => player.username !== username) // Exclude the local player
+          .map((player, index) => {
+            const position = getPlayerPositions()[index + 1]; // Shift index to ensure correct mapping
+            return (
+              <PlayerPosition
+                key={player.username}
+                position={position}
+                playerName={player.username}
+                cardCount={player.cardCount}
+              />
+            );
+          })}
 
         <div className="center-area">
           <div className="pile">

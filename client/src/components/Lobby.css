@@ -132,7 +132,7 @@ h1 {
 }
 
 .join-button:hover {
-  background-color: rgb(110, 140, 138);
+  background-color: rgb(113, 169, 165);
   transform: translateY(-1px);
   box-shadow: 
     0 4px 8px rgba(0, 0, 0, 0.15),
@@ -168,7 +168,7 @@ h1 {
 }
 
 .start-button:hover {
-  background-color: rgb(50, 93, 91);
+  background-color: rgb(42, 77, 75);
   transform: translateY(-1px);
   box-shadow: 
     0 4px 8px rgba(0, 0, 0, 0.15),

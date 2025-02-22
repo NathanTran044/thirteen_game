@@ -52,7 +52,7 @@
 
 .player.left .player-avatar {
   order: -1; /* Moves avatar before the card stack */
-  margin-right: 10px;
+  margin-right: 20px;
 }
 
 .player.right {
@@ -62,7 +62,7 @@
 
 .player.right .player-avatar {
   order: 1; /* Moves avatar after the card stack */
-  margin-left: 10px;
+  margin-left: 20px;
 }
 
 .player.top {
@@ -77,8 +77,11 @@
 
 /* Player avatar styles */
 .player-avatar {
-  text-align: center;
-  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
 }
 
 .avatar-circle {
@@ -91,10 +94,16 @@
   align-items: center;
   justify-content: center;
   font-weight: bold;
+  font-size: 15px;
+  text-transform: uppercase;
 }
 
 .player-name {
   font-size: 12px;
+  white-space: nowrap;  /* Prevents wrapping */
+  overflow: hidden;  /* Hides overflowing text */
+  text-overflow: ellipsis;
+  max-width: 100px;
 }
 
 /* Card stack styles */

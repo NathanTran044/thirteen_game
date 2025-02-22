@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import "./Lobby.css";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 function Lobby({ socket }) {
   const [username, setUsername] = useState("");
@@ -17,7 +20,15 @@ function Lobby({ socket }) {
           console.log(`${id} Successfully joined room: ${room}`);
           setGameId(id);
         } else {
-          alert(`Failed to join room: ${room}`);
+          toast.error(`Failed to join room: ${room}`, {
+            position: "top-right",
+            autoClose: 2000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            draggable: true,
+            pauseOnHover: false,
+            theme: "light",
+          });
         }
       });
     }
@@ -28,7 +39,15 @@ function Lobby({ socket }) {
     if (roomSize > 1 && roomSize <= 4) {
       socket.emit("start_game", { num_players: roomSize, room });
     } else {
-      alert("Invalid number of players.");
+      toast.error("Invalid number of players.", {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        pauseOnHover: false,
+        theme: "light",
+      });
     }
   };
 
@@ -40,7 +59,15 @@ function Lobby({ socket }) {
     });
 
     socket.on("invalid_move", (data) => {
-      alert(data.message);
+      toast.error(data.message, {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        pauseOnHover: false,
+        theme: "light",
+      });
     });
 
     socket.on("begin_game", () => {
@@ -58,6 +85,7 @@ function Lobby({ socket }) {
 
   return (
     <div className="lobby-container">
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
       <div className="lobby-box">
         <div className="content-wrapper">
           <h1>Join Room</h1>
