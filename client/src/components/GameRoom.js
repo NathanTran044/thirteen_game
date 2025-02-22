@@ -117,13 +117,13 @@ function GameRoom({ socket }) {
   const passTurn = () => {
     console.log("Passing");
     socket.emit("play_card", { gameId, selectedCard: "pass" });
-  }
+  };
 
   const disconnect = () => {
     console.log("Disconnecting");
     socket.emit("leave_room");
     navigate("/");
-  }
+  };
 
   useEffect(() => {
     socket.on("room_info_update", ({ roomSize, gameId }) => {
@@ -155,6 +155,18 @@ function GameRoom({ socket }) {
         theme: "light",
       });
     });
+
+    socket.on("player_passed", (data) => {
+      toast.info(`${data.playerName} passed`, {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        pauseOnHover: false,
+        theme: "light",
+      });
+    })
 
     socket.on("player_finished", (data) => {
       // setPlayerCards([]);
@@ -199,67 +211,71 @@ function GameRoom({ socket }) {
       socket.off("player_finished");
       socket.off("game_over");
       socket.off("force_disconnect");
+      socket.off("player_passed");
     };
   }, [socket]);
 
-  return (
-    
-    <div className="game-room">
-      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
-      <div className="game-header">
-        <h2>{currentTurn}'s Turn</h2>
-        <button className="leave-button" onClick={disconnect}>Leave Game</button>
-      </div>
-
-      <div className="game-table">
-        {players && players
-          .filter(player => player.username !== username) // Exclude the local player
-          .map((player, index) => {
-            const position = getPlayerPositions()[index + 1]; // Shift index to ensure correct mapping
-            return (
-              <PlayerPosition
-                key={player.username}
-                position={position}
-                playerName={player.username}
-                cardCount={player.cardCount}
-              />
-            );
-          })}
-
-        <div className="center-area">
-          <div className="pile">
-          {lastPlayedCard && 
-            lastPlayedCard.split(" ").map((card, index) => (
-              <Card key={index} card={card} isSelectable={false} />
-            ))
-          }
-          </div>
+  return ( 
+    <div>
+      <div className="game-room">
+        <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
+        <div className="game-header">
+          <h2>{currentTurn}'s Turn</h2>
+          <button className="leave-button" onClick={disconnect}>Leave Game</button>
         </div>
 
-        <div className="player-hand">
-          <div className="cards">
-            {playerCards.map((card, index) => (
-              <Card
-                key={index}
-                card={card}
-                isSelected={selectedCard.includes(card)}
-              />
-            ))}
-          </div>
-          <div className="controls">
-            <button 
-              className="play-button"
-              onClick={playCard}
-              disabled={selectedCard.length === 0}
-            >
-              Play
-            </button>
-            <button 
-              className="pass-button"
-              onClick={passTurn}
-            >
-              Pass
-            </button>
+        <div className="game-container">
+          <div className="game-table">
+            {players && players
+              .filter(player => player.username !== username)
+              .map((player, index) => {
+                const position = getPlayerPositions()[index + 1];
+                return (
+                  <PlayerPosition
+                    key={player.username}
+                    position={position}
+                    playerName={player.username}
+                    cardCount={player.cardCount}
+                  />
+                );
+              })}
+
+            <div className="center-area">
+              <div className="pile">
+                {lastPlayedCard && 
+                  lastPlayedCard.split(" ").map((card, index) => (
+                    <Card key={index} card={card} isSelectable={false} />
+                  ))
+                }
+              </div>
+            </div>
+
+            <div className="player-hand">
+              <div className="cards">
+                {playerCards.map((card, index) => (
+                  <Card
+                    key={index}
+                    card={card}
+                    isSelected={selectedCard.includes(card)}
+                  />
+                ))}
+              </div>
+              <div className="controls">
+                <button 
+                  className="play-button"
+                  onClick={playCard}
+                  disabled={selectedCard.length === 0}
+                >
+                  Play
+                </button>
+                <button 
+                  className="pass-button"
+                  onClick={passTurn}
+                >
+                  Pass
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

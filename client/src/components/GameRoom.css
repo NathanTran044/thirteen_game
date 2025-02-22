@@ -1,7 +1,7 @@
 .game-room {
   width: 100%;
   height: 100vh;
-  background-color: #0a6b0a;
+  background-color: hsl(120, 83%, 23%);
   padding: 20px;
   color: white;
   overflow: hidden;
@@ -14,28 +14,47 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px;
-  height: 50px;
+  padding: 10px 15px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
 }
 
 .leave-button {
-  background-color: #d32f2f;
+  background-color: #d32f2ff1;
   color: white;
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
+  padding: 8px 13px;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.game-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1); /* Extends transparent box */
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 15px;
+  
 }
 
 .game-table {
   flex: 1;
   display: grid;
   grid-template-columns: minmax(150px, 1fr) auto minmax(150px, 1fr);
-  grid-template-rows: minmax(70px, 0.2fr)  minmax(200px, 2fr) minmax(180px, 1.3fr);
+  grid-template-rows: minmax(70px, 0.2fr) minmax(190px, 2.3fr) minmax(180px, 1.40fr);
   gap: 10px;
   max-width: 90vw;
   margin: 0 auto;
   width: 100%;
+  padding: 20px;
+  margin-top: 30px;
 }
 
 .player {
@@ -68,11 +87,11 @@
 .player.top {
   flex-direction: column-reverse; /* Flips order: Avatar above cards */
   align-items: center;
-  margin-top: 90px;
+  margin-top: 105px;
 }
 
 .player.top .player-avatar {
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 /* Player avatar styles */
@@ -130,7 +149,7 @@
 .playing-card {
   width: 66px;
   height: 88px;
-  border-radius: 4px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -156,7 +175,7 @@
 .player.left .card-stack .playing-card:not(:first-child),
 .player.right .card-stack .playing-card:not(:first-child) {
   margin-left: 0;
-  margin-top: -70px;
+  margin-top: -75px;
 }
 
 .playing-card.selectable:hover {
@@ -186,7 +205,6 @@
   gap: 8px;
   justify-content: center;
   align-items: center;
-  margin-top: 10px;
 }
 
 .pile .playing-card {
@@ -202,6 +220,7 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
+  margin-top: 25px;
 }
 
 .cards {
@@ -226,19 +245,19 @@
 .controls {
   display: flex;
   gap: 10px;
-  margin-top: 5px;
+  margin-top: 10px;
 }
 
 .play-button, .pass-button {
   padding: 6px 20px;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
 }
 
 .play-button {
-  background-color: #4caf50;
+  background-color: #4caf4fe9;
   color: white;
 }
 
@@ -248,7 +267,7 @@
 }
 
 .pass-button {
-  background-color: #f44336;
+  background-color: #d32f2ff1;
   color: white;
 }
 
@@ -299,6 +318,6 @@
   /* Adjust vertical stacking for mobile */
   .player.left .card-stack .playing-card:not(:first-child),
   .player.right .card-stack .playing-card:not(:first-child) {
-    margin-top: -55px;
+    margin-top: -60px;
   }
 }
