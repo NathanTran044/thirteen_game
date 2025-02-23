@@ -18,7 +18,9 @@ function GameRoom({ socket }) {
   const [currentTurn, setCurrentTurn] = useState("");
   const [lastPlayedCard, setLastPlayedCard] = useState("");
   const [players, setPlayers] = useState([]);
-  
+  const [messages, setMessages] = useState([]);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [hasNewMessage, setHasNewMessage] = useState(false);
 
   const getPlayerPositions = () => {
     switch (roomSize) {
@@ -125,6 +127,11 @@ function GameRoom({ socket }) {
     navigate("/");
   };
 
+  const openChat = () => {
+    setIsChatOpen(true);
+    setHasNewMessage(false); // Clear notification when opening chat
+  };
+
   useEffect(() => {
     socket.on("room_info_update", ({ roomSize, gameId }) => {
       setRoomSize(roomSize);
@@ -143,6 +150,13 @@ function GameRoom({ socket }) {
       console.log("Player hand updated:", data);
       setPlayerCards(data);
     })
+
+    socket.on("receive_message", (data) => {
+      setMessages((prev) => [...prev, data]);
+      if (!isChatOpen) {
+        setHasNewMessage(true); // Show notification if chat is closed
+      }
+    });
 
     socket.on("invalid_move", (data) => {
       toast.error(data.message, {
@@ -207,13 +221,14 @@ function GameRoom({ socket }) {
       socket.off("begin_game");
       socket.off("game_state_update");
       socket.off("player_hand");
+      socket.off("receive_message");
       socket.off("invalid_move");
       socket.off("player_finished");
       socket.off("game_over");
       socket.off("force_disconnect");
       socket.off("player_passed");
     };
-  }, [socket]);
+  }, [socket, isChatOpen]);
 
   return ( 
     <div>
@@ -221,7 +236,13 @@ function GameRoom({ socket }) {
         <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
         <div className="game-header">
           <h2>{currentTurn}'s Turn</h2>
-          <button className="leave-button" onClick={disconnect}>Leave Game</button>
+          <div className="header-buttons">
+          <button className="chat-button" onClick={openChat}>
+            Chat
+            {hasNewMessage && <span className="chat-notification"></span>}
+          </button>
+            <button className="leave-button" onClick={disconnect}>Leave Game</button>
+          </div>
         </div>
 
         <div className="game-container">
@@ -279,6 +300,16 @@ function GameRoom({ socket }) {
           </div>
         </div>
       </div>
+
+      <Chat 
+        socket={socket} 
+        room={room} 
+        username={username} 
+        isOpen={isChatOpen}
+        onClose={() => setIsChatOpen(false)}
+        messages={messages}
+        setMessages={setMessages}
+      />
     </div>
   );
 }

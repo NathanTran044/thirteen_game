@@ -1,18 +1,8 @@
 import React, { useState, useEffect } from "react";
+import "./Chat.css";
 
-function Chat({ socket, room, username }) {
+function Chat({ socket, room, username, isOpen, onClose, messages, setMessages }) {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState([]);
-
-  useEffect(() => {
-    socket.on("receive_message", (data) => {
-      setMessages((prev) => [...prev, data]);
-    });
-
-    return () => {
-      socket.off("receive_message");
-    };
-  }, [socket]);
 
   const sendMessage = () => {
     if (message.trim()) {
@@ -21,18 +11,45 @@ function Chat({ socket, room, username }) {
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      sendMessage();
+    }
+  };
+
+  if (!isOpen) return null;
+
   return (
-    <div>
-      <h3>Chat</h3>
-      <input type="text" placeholder="Message..." value={message} onChange={(e) => setMessage(e.target.value)} />
-      <button onClick={sendMessage}>Send</button>
-      <div>
-        {messages.map((msg, index) => (
-          <p key={index}><strong>{msg.username}:</strong> {msg.message}</p>
-        ))}
+    <div className="chat-modal-overlay">
+      <div className="chat-modal">
+        <div className="chat-header">
+          <h3>Game Chat</h3>
+          <button className="close-button" onClick={onClose}>×</button>
+        </div>
+        
+        <div className="chat-messages">
+          {messages.map((msg, index) => (
+            <div key={index} className={`message ${msg.username === username ? 'sent' : 'received'}`}>
+              <span className="username">{msg.username}</span>
+              <p className="message-content">{msg.message}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="chat-input">
+          <input
+            type="text"
+            placeholder="Type a message..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyPress={handleKeyPress}
+          />
+          <button onClick={sendMessage}>Send</button>
+        </div>
       </div>
     </div>
   );
 }
+
 
 export default Chat;
