@@ -147,9 +147,9 @@
 
 /* Card styles */
 .playing-card {
-  width: 66px;
-  height: 88px;
-  border-radius: 8px;
+  width: 68px;
+  height: 90px;
+  border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -175,7 +175,7 @@
 .player.left .card-stack .playing-card:not(:first-child),
 .player.right .card-stack .playing-card:not(:first-child) {
   margin-left: 0;
-  margin-top: -75px;
+  margin-top: -77px;
 }
 
 .playing-card.selectable:hover {
@@ -241,19 +241,31 @@
   margin-right: -20px;
 }
 
+.cards .playing-card:last-child {
+  margin-right: 0;
+}
+
+.cards:hover .playing-card:last-child {
+  margin-right: 0px;
+}
+
 /* Control buttons */
 .controls {
   display: flex;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 20px;
+  margin-top: 15px;
+  justify-content: center;
 }
 
 .play-button, .pass-button {
-  padding: 6px 20px;
+  padding: 7px 20px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 15px;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .play-button {
@@ -262,13 +274,27 @@
 }
 
 .play-button:disabled {
-  background-color: #ccc;
+  background: #bdbdbd;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .pass-button {
   background-color: #d32f2ff1;
   color: white;
+}
+
+.play-button:hover:not(:disabled),
+.pass-button:hover {
+  filter: brightness(1.1);
+  transform: scale(1.05);
+}
+
+/* Click Effect */
+.play-button:active,
+.pass-button:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 /* Player positions */
