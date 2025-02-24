@@ -230,12 +230,12 @@
   margin-top: -77px;
 }
 
-.playing-card.selectable:hover:not(.is-dragging) {
+.playing-card.selectable:hover {
   transform: translateY(-10px);
   z-index: 2;
 }
 
-.playing-card.selected:not(.is-dragging) {
+.playing-card.selected {
   transform: translateY(-10px);
   box-shadow: 0 0 0 2px #2196f3;
   z-index: 1;
@@ -243,20 +243,21 @@
 
 .playing-card.is-dragging {
   opacity: .5 !important;
-  transform: translateY(0px) !important;
+  /* transform: translateY(0px) !important; */
   box-shadow: 0 0 10px rgba(33, 150, 243, 0.5) !important;
-  /* transition: transform 0.2s ease-in-out; */
+  transition: transform 0.2s ease-in-out;
   /* border: isOver ? '2px dashed red' : 'none', */
 }
 
 .playing-card.is-over {
-  transform: translateY(0px);
+  transform: translateY(-5px);
   box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
+  border: 3px solid rgb(64, 124, 177);
+  border-radius: 8px;
 }
 
-.playing-card.no-hover
-.playing-card.no-hover:hover {
-  transform: translateY(0px) !important;
+.playing-card.no-hover {
+  transform: translateY(0) !important;
   z-index: 1;
 }
 

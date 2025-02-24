@@ -23,8 +23,6 @@ function GameRoom({ socket }) {
   const [messages, setMessages] = useState([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [hasNewMessage, setHasNewMessage] = useState(false);
-  const [isDraggingCard, setIsDraggingCard] = useState(false);
-
 
   const getPlayerPositions = () => {
     switch (roomSize) {
@@ -93,52 +91,48 @@ function GameRoom({ socket }) {
     </div>
   );
 
-  const DraggableCard = ({ index, card, isSelected, moveCard, setIsDraggingCard, isDraggingCard }) => {
-    const [{ isDragging }, drag] = useDrag({
-      type: "card",
-      item: { index },
-      collect: (monitor) => {
-        const dragging = monitor.isDragging();
-        setIsDraggingCard(dragging); // Set global dragging state
-        return { isDragging: dragging };
-      },
-      end: () => setIsDraggingCard(false), // Reset when dragging stops
-    });
-  
-    const [{ isOver }, drop] = useDrop({
-      accept: "card",
-      hover(item) {
-        if (item.index !== index) {
-          moveCard(item.index, index);
-          item.index = index;
-        }
-      },
-      collect: (monitor) => ({
-        isOver: monitor.isOver(),
-      }),
-    });
-  
-    return (
-      <div
-        ref={(node) => drag(drop(node))}
-        className={`
-          playing-card 
-          selectable 
-          ${isSelected ? "selected" : ""} 
-          ${isDragging ? "is-dragging" : ""} 
-          ${isOver ? "is-over" : ""} 
+  const DraggableCard = ({ index, card, isSelected, moveCard }) => {
+  const [{ isDragging }, drag] = useDrag({
+    type: 'card',
+    item: { index },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
 
-        `}
-        onClick={() => handleCardClick(card)}
-      >
-        <img 
-          src={`/images/cards/${getCardImage(card)}`}
-          alt={card}
-          className="card-image"
-        />
-      </div>
-    );
-  };
+  const [{ isOver }, drop] = useDrop({
+    accept: 'card',
+    hover(item) {
+      if (item.index !== index) {
+        moveCard(item.index, index);
+        item.index = index;
+      }
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+    }),
+  });
+
+  return (
+    <div
+      ref={(node) => drag(drop(node))}
+      className={`
+        playing-card 
+        selectable 
+        ${isSelected ? 'selected' : ''} 
+        ${isDragging ? 'is-dragging' : ''} 
+        ${isOver ? 'is-over' : ''}
+      `}
+      onClick={() => handleCardClick(card)}
+    >
+      <img 
+        src={`/images/cards/${getCardImage(card)}`}
+        alt={card}
+        className="card-image"
+      />
+    </div>
+  );
+};
 
   const PlayerPosition = ({ position, playerName, cardCount = 0 }) => {
     const [isHovered, setIsHovered] = useState(false);
@@ -339,8 +333,6 @@ function GameRoom({ socket }) {
                       card={card}
                       isSelected={selectedCard.includes(card)}
                       moveCard={moveCard}
-                      setIsDraggingCard={setIsDraggingCard} // Allow cards to update the state
-                      isDraggingCard={isDraggingCard} // Pass state down to apply CSS changes
                     />
                   ))}
                 </div>
