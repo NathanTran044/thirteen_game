@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { DndProvider, useDrag, useDrop } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import Chat from "./Chat";
 import './GameRoom.css';
 import { toast } from "react-toastify";
@@ -14,13 +16,15 @@ function GameRoom({ socket }) {
   const [roomSize, setRoomSize] = useState(initialSize);
   const [playerCards, setPlayerCards] = useState([]);
   const [gameId, setGameId] = useState("");
-  const [selectedCard, setSelectedCard] = useState("");
+  const [selectedCard, setSelectedCard] = useState([]);
   const [currentTurn, setCurrentTurn] = useState("");
   const [lastPlayedCard, setLastPlayedCard] = useState("");
   const [players, setPlayers] = useState([]);
   const [messages, setMessages] = useState([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [hasNewMessage, setHasNewMessage] = useState(false);
+  const [isDraggingCard, setIsDraggingCard] = useState(false);
+
 
   const getPlayerPositions = () => {
     switch (roomSize) {
@@ -82,13 +86,59 @@ function GameRoom({ socket }) {
       onClick={() => isSelectable && handleCardClick(card)}
     >
       <img 
-        // src={`../images/cards/${faceDown ? 'cardBack.png' : getCardImage(card)}`} 
         src={`/images/cards/${faceDown ? 'cardBack.png' : getCardImage(card)}`} 
         alt={faceDown ? 'Card back' : card}
         className="card-image"
       />
     </div>
   );
+
+  const DraggableCard = ({ index, card, isSelected, moveCard, setIsDraggingCard, isDraggingCard }) => {
+    const [{ isDragging }, drag] = useDrag({
+      type: "card",
+      item: { index },
+      collect: (monitor) => {
+        const dragging = monitor.isDragging();
+        setIsDraggingCard(dragging); // Set global dragging state
+        return { isDragging: dragging };
+      },
+      end: () => setIsDraggingCard(false), // Reset when dragging stops
+    });
+  
+    const [{ isOver }, drop] = useDrop({
+      accept: "card",
+      hover(item) {
+        if (item.index !== index) {
+          moveCard(item.index, index);
+          item.index = index;
+        }
+      },
+      collect: (monitor) => ({
+        isOver: monitor.isOver(),
+      }),
+    });
+  
+    return (
+      <div
+        ref={(node) => drag(drop(node))}
+        className={`
+          playing-card 
+          selectable 
+          ${isSelected ? "selected" : ""} 
+          ${isDragging ? "is-dragging" : ""} 
+          ${isOver ? "is-over" : ""} 
+
+        `}
+        onClick={() => handleCardClick(card)}
+      >
+        <img 
+          src={`/images/cards/${getCardImage(card)}`}
+          alt={card}
+          className="card-image"
+        />
+      </div>
+    );
+  };
 
   const PlayerPosition = ({ position, playerName, cardCount = 0 }) => {
     const [isHovered, setIsHovered] = useState(false);
@@ -109,11 +159,19 @@ function GameRoom({ socket }) {
     );
   };
 
+  const moveCard = (dragIndex, hoverIndex) => {
+    const newCards = [...playerCards];
+    const draggedCard = newCards[dragIndex];
+    newCards.splice(dragIndex, 1);
+    newCards.splice(hoverIndex, 0, draggedCard);
+    setPlayerCards(newCards);
+  };
+
   const playCard = () => {
     const selectedCardString = selectedCard.join(' ');
     console.log("GameId and Card played: " + gameId + " " + selectedCardString);
     socket.emit("play_card", { gameId, selectedCard: selectedCardString });
-    setSelectedCard("")
+    setSelectedCard([]);
   };
 
   const passTurn = () => {
@@ -144,12 +202,12 @@ function GameRoom({ socket }) {
       setCurrentTurn(data.currentTurn);
       setLastPlayedCard(data.lastPlayedCard);
       setPlayers(data.players);
-    })
+    });
 
     socket.on("player_hand", (data) => {
       console.log("Player hand updated:", data);
       setPlayerCards(data);
-    })
+    });
 
     socket.on("receive_message", (data) => {
       setMessages((prev) => [...prev, data]);
@@ -180,7 +238,7 @@ function GameRoom({ socket }) {
         pauseOnHover: false,
         theme: "light",
       });
-    })
+    });
 
     socket.on("player_finished", (data) => {
       // setPlayerCards([]);
@@ -214,7 +272,7 @@ function GameRoom({ socket }) {
     socket.on("force_disconnect", () => {
       socket.emit("leave_room");
       navigate("/");
-    })
+    });
 
     return () => {
       socket.off("room_info_update");
@@ -228,7 +286,7 @@ function GameRoom({ socket }) {
       socket.off("force_disconnect");
       socket.off("player_passed");
     };
-  }, [socket, isChatOpen]);
+  }, [socket, isChatOpen, navigate]);
 
   return ( 
     <div>
@@ -271,32 +329,38 @@ function GameRoom({ socket }) {
               </div>
             </div>
 
-            <div className="player-hand">
-              <div className="cards">
-                {playerCards.map((card, index) => (
-                  <Card
-                    key={index}
-                    card={card}
-                    isSelected={selectedCard.includes(card)}
-                  />
-                ))}
+            <DndProvider backend={HTML5Backend}>
+              <div className="player-hand">
+                <div className="cards">
+                  {playerCards.map((card, index) => (
+                    <DraggableCard
+                      key={index}
+                      index={index}
+                      card={card}
+                      isSelected={selectedCard.includes(card)}
+                      moveCard={moveCard}
+                      setIsDraggingCard={setIsDraggingCard} // Allow cards to update the state
+                      isDraggingCard={isDraggingCard} // Pass state down to apply CSS changes
+                    />
+                  ))}
+                </div>
+                <div className="controls">
+                  <button 
+                    className="play-button"
+                    onClick={playCard}
+                    disabled={selectedCard.length === 0}
+                  >
+                    Play
+                  </button>
+                  <button 
+                    className="pass-button"
+                    onClick={passTurn}
+                  >
+                    Pass
+                  </button>
+                </div>
               </div>
-              <div className="controls">
-                <button 
-                  className="play-button"
-                  onClick={playCard}
-                  disabled={selectedCard.length === 0}
-                >
-                  Play
-                </button>
-                <button 
-                  className="pass-button"
-                  onClick={passTurn}
-                >
-                  Pass
-                </button>
-              </div>
-            </div>
+            </DndProvider>
           </div>
         </div>
       </div>
