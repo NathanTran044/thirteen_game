@@ -14,6 +14,8 @@ const io = new Server(server, {
     origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
+  pingTimeout: 5000, // Close connection if client doesn't respond to ping within 5s
+  pingInterval: 10000 // Send a ping every 10s
 });
 
 // Constants
@@ -25,6 +27,7 @@ const ALL_CARDS = ["3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A", 
 
 const gameSessions = {}; // Store game states
 const playerNames = {}; // Store player names
+const playerRooms = {}; // Track which room each socket is in
 
 const cardSort = (a, b) => {
   const ranks = ["3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A", "2"];
@@ -122,27 +125,33 @@ io.on("connection", (socket) => {
     console.log(`Received event: ${event}`, args);
   });
 
+  // Handle disconnections (both graceful and ungraceful)
+  socket.on("disconnect", () => {
+    console.log(`User Disconnected: ${socket.id}`);
+    handlePlayerDisconnect(socket);
+  });
+
   socket.on("join_room", ({ username, room }, callback) => {
     const roomName = String(room);
 
     for (let gameId in gameSessions) {
-      let game = gameSessions[gameId]; // Get the game session object
+      let game = gameSessions[gameId];
       if (game.room == roomName) {
         socket.emit("invalid_move", { message: "Cannot join room. Game in progress." });
         return;
       }
     }
 
-    const sizeBefore = io.sockets.adapter.rooms.get(roomName)?.size || 0
+    const sizeBefore = io.sockets.adapter.rooms.get(roomName)?.size || 0;
     if (sizeBefore == 4) {
       socket.emit("invalid_move", { message: "Cannot join room. Room is full." });
-        return;
+      return;
     }
 
-
     socket.join(roomName);
-    console.log("joining room ", roomName)
+    console.log("joining room ", roomName);
     socket.room = roomName;
+    playerRooms[socket.id] = roomName; // Track player's room
 
     const roomSize = io.sockets.adapter.rooms.get(roomName)?.size || 0;
     console.log(`User ${socket.id} joined room: ${roomName}, Total users: ${roomSize}`);
@@ -483,29 +492,84 @@ io.on("connection", (socket) => {
           delete gameSessions[gameId];
           break;
       }
-  }
-    // if (socket.room) {
-    //   let roomSize = io.sockets.adapter.rooms.get(socket.room)?.size || 0;
-    //   roomSize = roomSize - 1;
-
-    //   // update old room's size
-    //   const gameId = uuidv4();
-    //   io.to(socket.room).emit("room_info_update", { roomSize, gameId });
-
-    //   // game in empty room needs to be stopped
-    //   if (roomSize == 0) {
-    //     for (let gameId in gameSessions) {
-    //       let game = gameSessions[gameId]; // Get the game session object
-    //       if (game.room == socket.room) {
-    //         delete gameSessions[gameId];
-    //         break;
-    //       }
-    //     }
-    //   }
-    //   socket.leave(socket.room);
-    // }
+    }
   });
 });
+
+// Function to handle player disconnection
+function handlePlayerDisconnect(socket) {
+  const room = playerRooms[socket.id];
+  if (!room) return;
+
+  // Remove player from tracking
+  delete playerNames[socket.id];
+  delete playerRooms[socket.id];
+
+  // Check if room is empty
+  const roomSize = io.sockets.adapter.rooms.get(room)?.size || 0;
+  if (roomSize <= 1) { // 1 because the disconnecting socket hasn't been removed yet
+    // Clean up any game sessions for this room
+    for (let gameId in gameSessions) {
+      if (gameSessions[gameId].room === room) {
+        delete gameSessions[gameId];
+        break;
+      }
+    }
+  }
+
+  // Force all players to leave if game was in progress
+  const affectedGame = Object.entries(gameSessions).find(([_, game]) => game.room === room);
+  if (affectedGame) {
+    io.to(room).emit("force_disconnect");
+    const socketsInRoom = io.sockets.adapter.rooms.get(room);
+    if (socketsInRoom) {
+      socketsInRoom.forEach((socketId) => {
+        const playerSocket = io.sockets.sockets.get(socketId);
+        if (playerSocket) {
+          console.log(`Forcing ${socketId} to leave room ${room}`);
+          playerSocket.leave(room);
+        }
+      });
+    }
+  }
+}
+
+// Periodic cleanup of stale rooms (every 30 seconds)
+setInterval(() => {
+  const rooms = io.sockets.adapter.rooms;
+  rooms.forEach((sockets, room) => {
+    // Skip Socket.IO internal rooms (they start with a slash)
+    if (room.startsWith('/')) return;
+
+    // Check if any sockets in the room are actually connected
+    let hasActiveConnections = false;
+    sockets.forEach(socketId => {
+      const socket = io.sockets.sockets.get(socketId);
+      if (socket && socket.connected) {
+        hasActiveConnections = true;
+      }
+    });
+
+    // Clean up room if no active connections
+    if (!hasActiveConnections) {
+      console.log(`Cleaning up stale room: ${room}`);
+      // Clean up any game sessions for this room
+      for (let gameId in gameSessions) {
+        if (gameSessions[gameId].room === room) {
+          delete gameSessions[gameId];
+          break;
+        }
+      }
+      // Clean up any player associations
+      for (let socketId in playerRooms) {
+        if (playerRooms[socketId] === room) {
+          delete playerRooms[socketId];
+          delete playerNames[socketId];
+        }
+      }
+    }
+  });
+}, 30000);
 
 server.listen(3001, () => {
   console.log("Server running on port 3001");
