@@ -178,7 +178,7 @@ function GameRoom({ socket }) {
   const disconnect = () => {
     console.log("Disconnecting");
     socket.emit("leave_room");
-    navigate("/");
+    navigate("/lobby");
   };
 
   const openChat = () => {
@@ -267,7 +267,7 @@ function GameRoom({ socket }) {
 
     socket.on("force_disconnect", () => {
       socket.emit("leave_room");
-      navigate("/");
+      navigate("/lobby");
     });
 
     return () => {

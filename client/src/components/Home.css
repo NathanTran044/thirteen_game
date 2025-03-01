@@ -1,0 +1,359 @@
+/* Home component specific styles */
+.home-container {
+  min-height: 100vh;
+  background-color: rgb(90, 146, 143);
+  background-image: linear-gradient(135deg, rgb(90, 146, 143) 0%, rgb(70, 126, 123) 100%);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  padding: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Remove the previous background shapes */
+.home-container::before,
+.home-container::after {
+  content: none;
+}
+
+/* Create a checkered pattern with card suits */
+.home-container .card-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(12, 1fr);
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.home-container .card-pattern-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 3rem;
+  opacity: 0.025;
+  color: white;
+  transition: opacity 0.5s ease;
+}
+
+/* Create a true checkered pattern with alternating suits */
+.home-container .card-pattern-item:nth-child(even) {
+  opacity: 0.5;
+}
+
+.home-container .card-pattern-item:nth-child(odd) {
+  opacity: 0.5;
+}
+
+/* Vary the sizes for visual interest */
+.home-container .card-pattern-item:nth-child(4n+1) {
+  font-size: 2.5rem;
+}
+
+.home-container .card-pattern-item:nth-child(4n+2) {
+  font-size: 3.5rem;
+}
+
+.home-container .card-pattern-item:nth-child(4n+3) {
+  font-size: 3rem;
+}
+
+.home-container .card-pattern-item:nth-child(4n+4) {
+  font-size: 4rem;
+}
+
+/* Slightly rotate some items for visual interest */
+.home-container .card-pattern-item:nth-child(3n) {
+  transform: rotate(10deg);
+}
+
+.home-container .card-pattern-item:nth-child(5n) {
+  transform: rotate(-8deg);
+}
+
+.home-container .card-pattern-item:nth-child(7n) {
+  transform: rotate(15deg);
+}
+
+/* Add a subtle hover effect to the pattern */
+.home-container:hover .card-pattern-item {
+  opacity: 0.035;
+}
+
+.home-container .home-content {
+  background-color: rgba(255, 251, 245, 0.95);
+  backdrop-filter: blur(4px);
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  padding: 2rem;
+  max-width: 800px;
+  width: 90%;
+  margin: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.home-container .home-content::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  bottom: 8px;
+  border: 1px solid rgba(90, 146, 143, 0.2);
+  border-radius: 10px;
+  pointer-events: none;
+}
+
+.home-container .home-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.home-container .home-header::after {
+  content: '';
+  display: block;
+  width: 80px;
+  height: 3px;
+  background-color: rgb(90, 146, 143);
+  margin: 1.5rem auto 0;
+  border-radius: 2px;
+}
+
+.home-container .home-header h1 {
+  color: rgb(90, 146, 143);
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  font-family: 'Playfair Display', serif;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.home-container .home-header p {
+  color: #666;
+  font-size: 1.1rem;
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+.home-container .instructions {
+  margin: 2rem 0;
+  text-align: center;
+  position: relative;
+}
+
+.home-container .instructions h2 {
+  color: rgb(90, 146, 143);
+  font-size: 2.2rem;
+  margin: 0 auto 2rem;
+  font-family: 'Playfair Display', serif;
+  text-align: center;
+  position: relative;
+  display: inline-block;
+  padding: 0 1rem 0.5rem;
+  border-bottom: 2px solid rgb(90, 146, 143);
+  letter-spacing: 1px;
+}
+
+.home-container .instructions-section {
+  background-color: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  border-left: 3px solid rgb(90, 146, 143);
+  border-right: 3px solid rgb(90, 146, 143);
+  text-align: left;
+}
+
+.home-container .instructions-section:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.home-container .instructions-section h3 {
+  color: #333;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-weight: 600;
+  border-bottom: 1px dashed rgba(90, 146, 143, 0.3);
+  padding-bottom: 0.5rem;
+}
+
+.home-container .instructions-section p, 
+.home-container .instructions-section li {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 0.8rem;
+  font-family: 'Source Sans Pro', sans-serif;
+}
+
+.home-container .instructions-section ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.home-container .instructions-section li {
+  padding-left: 1.5rem;
+  position: relative;
+  margin-bottom: 0.8rem;
+  transition: transform 0.1s ease;
+}
+
+.home-container .instructions-section li:before {
+  content: "•";
+  color: rgb(90, 146, 143);
+  font-weight: bold;
+  position: absolute;
+  left: 0;
+}
+
+.home-container .play-button {
+  display: block;
+  width: 220px;
+  margin: 2.5rem auto;
+  padding: 1rem 2rem;
+  background-color: rgb(90, 146, 143);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Source Sans Pro', sans-serif;
+  text-decoration: none;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 15px rgba(90, 146, 143, 0.4);
+}
+
+.home-container .play-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.7s ease;
+  z-index: -1;
+}
+
+.home-container .play-button::after {
+  content: '→';
+  position: absolute;
+  right: 20px;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.home-container .play-button:hover {
+  background-color: rgb(100, 163, 160);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(90, 146, 143, 0.5);
+  padding-right: 2.5rem;
+}
+
+.home-container .play-button:hover::before {
+  left: 100%;
+}
+
+.home-container .play-button:hover::after {
+  opacity: 1;
+  right: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .home-container .home-content {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+
+  .home-container .home-header h1 {
+    font-size: 2rem;
+  }
+
+  .home-container .instructions h2 {
+    font-size: 1.5rem;
+  }
+
+  .home-container .instructions-section {
+    padding: 1rem;
+  }
+}
+
+.home-container .card-suits {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}
+
+.home-container .suit-icon {
+  font-size: 1.8rem;
+  margin: 0 0.8rem;
+  display: inline-block;
+  animation: home-float 3s ease-in-out infinite;
+}
+
+.home-container .suit-icon:nth-child(1) {
+  color: #000;
+  animation-delay: 0s;
+}
+
+.home-container .suit-icon:nth-child(2) {
+  color: #000;
+  animation-delay: 0.75s;
+}
+
+.home-container .suit-icon:nth-child(3) {
+  color: #e94057;
+  animation-delay: 1.5s;
+}
+
+.home-container .suit-icon:nth-child(4) {
+  color: #e94057;
+  animation-delay: 2.25s;
+}
+
+@keyframes home-float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.home-container .suit {
+  display: inline-block;
+  margin-right: 0.5rem;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.home-container .instructions-section li .suit:nth-child(1) {
+  color: #000;
+}
+
+.home-container .instructions-section li .suit:nth-child(3),
+.home-container .instructions-section li .suit:nth-child(4) {
+  color: #e94057;
+} 

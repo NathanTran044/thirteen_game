@@ -14,6 +14,9 @@ function Navbar() {
       <h1>Thirteen</h1>
       <nav>
         <Link to="/" className={isActive("/") ? "active" : ""}>
+          Home
+        </Link>
+        <Link to="/lobby" className={isActive("/lobby") ? "active" : ""}>
           Lobby
         </Link>
       </nav>
