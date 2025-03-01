@@ -260,6 +260,11 @@ io.on("connection", (socket) => {
 
     // If a player passes
     if (selectedCard == "pass") {
+      if (game.lastPlayedCard == null || game.lastPlayedCard == "") {
+        socket.emit("invalid_move", { message: "Must play a card on a free turn." });
+        return;
+      }
+
       currentPlayer.skipped = true;
 
       // Check if all active players passed, only happens after a player has finished and all next players pass leading to free turn
@@ -289,7 +294,7 @@ io.on("connection", (socket) => {
       if (game.lastPlayedIndex == game.currentPlayerIndex) {
         game.lastPlayedCard = ""
       }
-      
+
       io.to(game.room).emit("player_passed", {
         playerName: playerNames[currentPlayer.id]
       });
