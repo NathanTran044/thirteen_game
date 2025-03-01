@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import Chat from "./Chat";
+import FinishOrderModal from "./FinishOrderModal";
 import './GameRoom.css';
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -23,6 +24,7 @@ function GameRoom({ socket }) {
   const [messages, setMessages] = useState([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [hasNewMessage, setHasNewMessage] = useState(false);
+  const [finishOrder, setFinishOrder] = useState(null);
 
   const getPlayerPositions = () => {
     switch (roomSize) {
@@ -225,7 +227,7 @@ function GameRoom({ socket }) {
     socket.on("player_passed", (data) => {
       toast.info(`${data.playerName} passed`, {
         position: "top-center",
-        autoClose: 2000,
+        autoClose: 1000,
         hideProgressBar: false,
         closeOnClick: true,
         draggable: true,
@@ -251,7 +253,7 @@ function GameRoom({ socket }) {
   
     socket.on("game_over", (data) => {
       setPlayerCards([]);
-      // setGameStarted(false);
+      setFinishOrder(data.finishOrder);
       toast.info(`Game over! Last Place: ${data.finished}`, {
         position: "top-center",
         autoClose: 2000,
@@ -365,6 +367,11 @@ function GameRoom({ socket }) {
         onClose={() => setIsChatOpen(false)}
         messages={messages}
         setMessages={setMessages}
+      />
+
+      <FinishOrderModal 
+        finishOrder={finishOrder}
+        onClose={() => setFinishOrder(null)}
       />
     </div>
   );

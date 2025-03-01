@@ -117,6 +117,59 @@ const validDoubleStraight = (cards) => {
   return true;
 };
 
+// Add this helper function before the socket.io event handlers
+function restartGame(oldGame) {
+  const room = oldGame.room;
+  const numPlayers = oldGame.players.length;
+  
+  // Deal new cards
+  const player_cards = dealCards(numPlayers);
+  if (!player_cards) {
+    console.log("Failed to deal cards for new game");
+    return null;
+  }
+
+  // Create new game state
+  const newGameId = uuidv4();
+  const newGame = {
+    players: [],
+    currentPlayerIndex: 0,
+    room,
+    lastPlayedCard: null,
+    lastPlayedIndex: 0,
+    finishOrder: [] // Initialize empty finish order for new game
+  };
+
+  // Get room players in their current order
+  const roomPlayers = oldGame.players.map(p => p.id);
+  
+  // Get the winner (first player to finish)
+  const winner = oldGame.finishOrder[0];
+  
+  // Find the index of the winner in the room players array
+  const firstPlayerIndex = roomPlayers.indexOf(winner);
+
+  roomPlayers.forEach((socketId, index) => {
+    newGame.players.push({
+      id: socketId,
+      hand: player_cards[index],
+      isTurn: false,
+      skipped: false,
+      finished: false
+    });
+
+    // Send new hand to each player
+    io.to(socketId).emit("player_hand", player_cards[index]);
+  });
+
+  // Assign the first turn to the winner of the last game
+  newGame.currentPlayerIndex = firstPlayerIndex;
+  newGame.lastPlayedIndex = firstPlayerIndex;
+  newGame.players[firstPlayerIndex].isTurn = true;
+
+  return { newGameId, newGame };
+}
+
 // Socket.io event handlers
 io.on("connection", (socket) => {
   console.log(`User Connected: ${socket.id}`);
@@ -189,7 +242,8 @@ io.on("connection", (socket) => {
       currentPlayerIndex: 0,
       room,
       lastPlayedCard: null,
-      lastPlayedIndex: 0
+      lastPlayedIndex: 0,
+      finishOrder: [] // Add array to track finish order
     };
   
     const roomPlayers = Array.from(io.sockets.adapter.rooms.get(room) || []);
@@ -329,12 +383,42 @@ io.on("connection", (socket) => {
       cards.length === 4 && cards.every(card => card.slice(0, -1) === "2")
     ) {
       currentPlayer.finished = true;
+      game.finishOrder.push(currentPlayer.id); // Add player to finish order when they win
       io.to(game.room).emit("player_finished", { finished: playerNames[socket.id] });
 
       if (game.players.filter(p => !p.finished).length === 1) {
         const lastPlayer = game.players.find(p => !p.finished);
-        io.to(game.room).emit("game_over", { finished: playerNames[lastPlayer.id] });
+        game.finishOrder.push(lastPlayer.id); // Add last player to finish order
+        
+        // Create array of player names in finish order
+        const finishOrderNames = game.finishOrder.map(playerId => playerNames[playerId]);
+        
+        io.to(game.room).emit("game_over", { 
+          finished: playerNames[lastPlayer.id],
+          finishOrder: finishOrderNames
+        });
+        
+        // Restart the game
+        const result = restartGame(game);
+        if (!result) return;
+
+        const { newGameId, newGame } = result;
+        
+        // Store new game and delete old one
+        gameSessions[newGameId] = newGame;
         delete gameSessions[gameId];
+
+        // Send new game state to all players
+        io.to(game.room).emit("game_state_update", {
+          gameId: newGameId,
+          currentTurn: playerNames[newGame.players[newGame.currentPlayerIndex].id],
+          lastPlayedCard: null,
+          players: newGame.players.map(player => ({
+            username: playerNames[player.id],
+            cardCount: player.hand.length
+          }))
+        });
+
         return;
       }
     }
@@ -434,13 +518,43 @@ io.on("connection", (socket) => {
     // Check if the player has won
     if (currentPlayer.hand.length === 0) {
       currentPlayer.finished = true;
+      game.finishOrder.push(currentPlayer.id); // Add player to finish order when they win
       io.to(game.room).emit("player_finished", { finished: playerNames[socket.id] });
       
       // Check if only one player remains
       if (game.players.filter(p => !p.finished).length === 1) {
         const lastPlayer = game.players.find(p => !p.finished);
-        io.to(game.room).emit("game_over", { finished: playerNames[lastPlayer.id] });
+        game.finishOrder.push(lastPlayer.id); // Add last player to finish order
+        
+        // Create array of player names in finish order
+        const finishOrderNames = game.finishOrder.map(playerId => playerNames[playerId]);
+        
+        io.to(game.room).emit("game_over", { 
+          finished: playerNames[lastPlayer.id],
+          finishOrder: finishOrderNames
+        });
+        
+        // Restart the game
+        const result = restartGame(game);
+        if (!result) return;
+
+        const { newGameId, newGame } = result;
+        
+        // Store new game and delete old one
+        gameSessions[newGameId] = newGame;
         delete gameSessions[gameId];
+
+        // Send new game state to all players
+        io.to(game.room).emit("game_state_update", {
+          gameId: newGameId,
+          currentTurn: playerNames[newGame.players[newGame.currentPlayerIndex].id],
+          lastPlayedCard: null,
+          players: newGame.players.map(player => ({
+            username: playerNames[player.id],
+            cardCount: player.hand.length
+          }))
+        });
+
         return;
       }
     }
