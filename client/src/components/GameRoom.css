@@ -250,7 +250,7 @@
 }
 
 .playing-card.is-over {
-  transform: translateY(-5px);
+  transform: translateY(-10px);
   box-shadow: 0 0 10px rgba(33, 150, 243, 0.5);
   border: 3px solid rgb(64, 124, 177);
   border-radius: 8px;

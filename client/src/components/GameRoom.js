@@ -161,6 +161,11 @@ function GameRoom({ socket }) {
     newCards.splice(dragIndex, 1);
     newCards.splice(hoverIndex, 0, draggedCard);
     setPlayerCards(newCards);
+    
+    // Send the updated card order to the server
+    if (gameId) {
+      socket.emit("update_card_order", { gameId, cards: newCards });
+    }
   };
 
   const playCard = () => {

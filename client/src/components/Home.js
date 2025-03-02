@@ -89,7 +89,7 @@ function Home() {
           <div className="instructions-section">
             <h3>Game Rules</h3>
             <ul>
-              <li>The player with the lowest card starts the first round</li>
+              <li>The player with the lowest card starts the first round, and the next rounds start with the previous winner</li>
               <li>Players must play a higher card or combination than the previous play (for combinations, the highest card determines if a combination is higher)</li>
               <li>Players can pass if they cannot or do not want to play</li>
               <li>When all players pass, the last player to play gets a free turn</li>

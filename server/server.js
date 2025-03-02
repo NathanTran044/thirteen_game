@@ -579,6 +579,20 @@ io.on("connection", (socket) => {
     console.log("finished playing selectedCard");
   });
 
+  socket.on("update_card_order", ({ gameId, cards }) => {
+    if (!gameId || !gameSessions[gameId]) {
+      return;
+    }
+    
+    // Find the player in the game
+    const game = gameSessions[gameId];
+    const player = game.players.find(p => p.id === socket.id);
+    
+    if (player) {
+      player.hand = cards;
+    }
+  });
+
   socket.on("leave_room", () => {
     console.log(`User Disconnected: ${socket.id}`);
 
