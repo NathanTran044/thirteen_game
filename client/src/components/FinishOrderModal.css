@@ -73,7 +73,7 @@
 .close-modal-button {
   margin-top: 20px;
   padding: 10px 24px;
-  background-color: #0a6b0a;
+  background-color: #d32f2ff1;
   color: white;
   border: none;
   border-radius: 8px;
@@ -83,5 +83,5 @@
 }
 
 .close-modal-button:hover {
-  background-color: #0d800d;
+  filter: brightness(1.1);
 } 

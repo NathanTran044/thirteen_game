@@ -1,8 +1,8 @@
 /* Home component specific styles */
 .home-container {
   min-height: 100vh;
-  background-color: rgb(90, 146, 143);
-  background-image: linear-gradient(135deg, rgb(90, 146, 143) 0%, rgb(70, 126, 123) 100%);
+  background-color: #5a928f;
+  background-image: linear-gradient(135deg, #5a928f 0%, #467e7b 100%);
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -14,13 +14,7 @@
   overflow: hidden;
 }
 
-/* Remove the previous background shapes */
-.home-container::before,
-.home-container::after {
-  content: none;
-}
-
-/* Create a checkered pattern with card suits */
+/* Card pattern background */
 .home-container .card-pattern {
   position: absolute;
   top: 0;
@@ -40,18 +34,18 @@
   justify-content: center;
   align-items: center;
   font-size: 3rem;
-  opacity: 0.025;
+  opacity: 0.04;
   color: white;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-/* Create a true checkered pattern with alternating suits */
+/* Create a more subtle checkered pattern with alternating suits */
 .home-container .card-pattern-item:nth-child(even) {
-  opacity: 0.5;
+  opacity: 0.1;
 }
 
 .home-container .card-pattern-item:nth-child(odd) {
-  opacity: 0.5;
+  opacity: 0.1;
 }
 
 /* Vary the sizes for visual interest */
@@ -86,149 +80,150 @@
 
 /* Add a subtle hover effect to the pattern */
 .home-container:hover .card-pattern-item {
-  opacity: 0.035;
+  opacity: 0.2;
+  transform: scale(1.05);
 }
 
 .home-container .home-content {
-  background-color: rgba(255, 251, 245, 0.95);
-  backdrop-filter: blur(4px);
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  padding: 2rem;
+  background-color: rgba(255, 251, 245, 0.97);
+  backdrop-filter: blur(6px);
+  border-radius: 16px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15);
+  padding: 2.5rem;
   max-width: 800px;
   width: 90%;
-  margin: 2rem;
+  margin: 2rem auto;
   position: relative;
   z-index: 1;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .home-container .home-content::before {
   content: '';
   position: absolute;
-  top: 8px;
-  left: 8px;
-  right: 8px;
-  bottom: 8px;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
   border: 1px solid rgba(90, 146, 143, 0.2);
-  border-radius: 10px;
+  border-radius: 12px;
   pointer-events: none;
 }
 
 .home-container .home-header {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   position: relative;
 }
 
 .home-container .home-header::after {
   content: '';
   display: block;
-  width: 80px;
+  width: 100px;
   height: 3px;
-  background-color: rgb(90, 146, 143);
+  background: linear-gradient(90deg, transparent, #5a928f, transparent);
   margin: 1.5rem auto 0;
   border-radius: 2px;
 }
 
 .home-container .home-header h1 {
-  color: rgb(90, 146, 143);
-  font-size: 2.5rem;
+  color: #467e7b;
+  font-size: 3rem;
   margin-bottom: 1rem;
   font-family: 'Playfair Display', serif;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  letter-spacing: 1px;
 }
 
 .home-container .home-header p {
-  color: #666;
-  font-size: 1.1rem;
+  color: #555;
+  font-size: 1.2rem;
   font-family: 'Source Sans Pro', sans-serif;
+  font-style: italic;
 }
 
 .home-container .instructions {
-  margin: 2rem 0;
+  margin: 2.5rem 0;
   text-align: center;
   position: relative;
 }
 
 .home-container .instructions h2 {
-  color: rgb(90, 146, 143);
+  color: #5a928f;
   font-size: 2.2rem;
-  margin: 0 auto 2rem;
+  margin: 0 auto 2.5rem;
   font-family: 'Playfair Display', serif;
   text-align: center;
   position: relative;
   display: inline-block;
-  padding: 0 1rem 0.5rem;
-  border-bottom: 2px solid rgb(90, 146, 143);
+  padding: 0 1.5rem 0.7rem;
+  border-bottom: 2px solid #5a928f;
   letter-spacing: 1px;
 }
 
 .home-container .instructions-section {
   background-color: white;
-  border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-radius: 10px;
+  padding: 1.8rem;
+  margin-bottom: 1.8rem;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
-  border-left: 3px solid rgb(90, 146, 143);
-  border-right: 3px solid rgb(90, 146, 143);
+  border-left: 4px solid #5a928f;
+  border-right: 4px solid #5a928f;
   text-align: left;
-}
-
-.home-container .instructions-section:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .home-container .instructions-section h3 {
   color: #333;
-  font-size: 1.3rem;
-  margin-bottom: 1rem;
+  font-size: 1.4rem;
+  margin-bottom: 1.2rem;
   font-family: 'Source Sans Pro', sans-serif;
   font-weight: 600;
-  border-bottom: 1px dashed rgba(90, 146, 143, 0.3);
-  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding-bottom: 0.7rem;
 }
 
 .home-container .instructions-section p, 
 .home-container .instructions-section li {
-  color: #555;
-  line-height: 1.6;
-  margin-bottom: 0.8rem;
+  color: #444;
+  line-height: 1.7;
+  margin-bottom: 0.9rem;
   font-family: 'Source Sans Pro', sans-serif;
+  font-size: 1.05rem;
 }
 
 .home-container .instructions-section ul {
   list-style-type: none;
-  padding-left: 0;
+  padding-left: 0.5rem;
 }
 
 .home-container .instructions-section li {
-  padding-left: 1.5rem;
+  padding-left: 1.7rem;
   position: relative;
-  margin-bottom: 0.8rem;
-  transition: transform 0.1s ease;
+  margin-bottom: 0.9rem;
+  transition: transform 0.2s ease;
 }
 
 .home-container .instructions-section li:before {
   content: "•";
-  color: rgb(90, 146, 143);
+  color: #5a928f;
   font-weight: bold;
+  font-size: 1.2rem;
   position: absolute;
   left: 0;
 }
 
 .home-container .play-button {
   display: block;
-  width: 220px;
-  margin: 2.5rem auto;
-  padding: 1rem 2rem;
-  background-color: rgb(90, 146, 143);
+  width: 240px;
+  margin: 3rem auto 1.5rem;
+  padding: 1.2rem 2.2rem;
+  background-color: #5a928f;
   color: white;
   border: none;
-  border-radius: 30px;
-  font-size: 1.3rem;
+  border-radius: 50px;
+  font-size: 1.4rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -238,8 +233,8 @@
   position: relative;
   overflow: hidden;
   z-index: 1;
-  letter-spacing: 1px;
-  box-shadow: 0 4px 15px rgba(90, 146, 143, 0.4);
+  letter-spacing: 1.5px;
+  box-shadow: 0 6px 20px rgba(90, 146, 143, 0.4);
 }
 
 .home-container .play-button::before {
@@ -249,7 +244,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
   transition: left 0.7s ease;
   z-index: -1;
 }
@@ -257,16 +252,16 @@
 .home-container .play-button::after {
   content: '→';
   position: absolute;
-  right: 20px;
+  right: 25px;
   opacity: 0;
   transition: all 0.3s ease;
 }
 
 .home-container .play-button:hover {
-  background-color: rgb(100, 163, 160);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(90, 146, 143, 0.5);
-  padding-right: 2.5rem;
+  background-color: #467e7b;
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(90, 146, 143, 0.6);
+  padding-right: 3rem;
 }
 
 .home-container .play-button:hover::before {
@@ -275,39 +270,85 @@
 
 .home-container .play-button:hover::after {
   opacity: 1;
-  right: 1.5rem;
+  right: 1.8rem;
+}
+
+.home-container .play-button:active {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(90, 146, 143, 0.5);
 }
 
 @media (max-width: 768px) {
+  .home-container {
+    padding: 1.5rem 1rem;
+  }
+
   .home-container .home-content {
-    padding: 1.5rem;
+    padding: 2rem 1.5rem;
     margin: 1rem;
+    width: 95%;
   }
 
   .home-container .home-header h1 {
-    font-size: 2rem;
+    font-size: 2.2rem;
+  }
+
+  .home-container .home-header p {
+    font-size: 1.1rem;
   }
 
   .home-container .instructions h2 {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
   }
 
   .home-container .instructions-section {
-    padding: 1rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .home-container .instructions-section h3 {
+    font-size: 1.3rem;
+  }
+
+  .home-container .instructions-section p,
+  .home-container .instructions-section li {
+    font-size: 1rem;
+  }
+
+  .home-container .play-button {
+    width: 80%;
+    font-size: 1.3rem;
+    padding: 1rem 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .home-container .home-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .home-container .instructions h2 {
+    font-size: 1.6rem;
+  }
+
+  .home-container .play-button {
+    width: 100%;
   }
 }
 
 .home-container .card-suits {
   display: flex;
   justify-content: center;
-  margin-top: 1rem;
+  margin-top: 2rem;
 }
 
 .home-container .suit-icon {
-  font-size: 1.8rem;
-  margin: 0 0.8rem;
+  font-size: 2rem;
+  margin: 0 1rem;
   display: inline-block;
-  animation: home-float 3s ease-in-out infinite;
+  animation: home-float 4s ease-in-out infinite;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
 
 .home-container .suit-icon:nth-child(1) {
@@ -317,43 +358,35 @@
 
 .home-container .suit-icon:nth-child(2) {
   color: #000;
-  animation-delay: 0.75s;
+  animation-delay: 1s;
 }
 
 .home-container .suit-icon:nth-child(3) {
   color: #e94057;
-  animation-delay: 1.5s;
+  animation-delay: 2s;
 }
 
 .home-container .suit-icon:nth-child(4) {
   color: #e94057;
-  animation-delay: 2.25s;
+  animation-delay: 3s;
 }
 
 @keyframes home-float {
   0% {
-    transform: translateY(0px);
+    transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-8px);
+    transform: translateY(-10px) rotate(5deg);
   }
   100% {
-    transform: translateY(0px);
+    transform: translateY(0px) rotate(0deg);
   }
 }
 
 .home-container .suit {
   display: inline-block;
   margin-right: 0.5rem;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   font-weight: bold;
+  vertical-align: middle;
 }
-
-.home-container .instructions-section li .suit:nth-child(1) {
-  color: #000;
-}
-
-.home-container .instructions-section li .suit:nth-child(3),
-.home-container .instructions-section li .suit:nth-child(4) {
-  color: #e94057;
-} 

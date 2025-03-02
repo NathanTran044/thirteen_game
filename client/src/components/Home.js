@@ -38,7 +38,7 @@ function Home() {
       <div className="home-content">
         <div className="home-header">
           <h1>Welcome to Thirteen</h1>
-          <p>Our version of the classic Vietnamese card game Thirteen (Tiến lên)</p>
+          <p>Our version of the classic Vietnamese card game Tiến Lên (Thirteen)</p>
           <div className="card-suits">
             <span className="suit-icon">♠</span>
             <span className="suit-icon">♣</span>
@@ -68,8 +68,8 @@ function Home() {
             <ul>
               <li><span className="suit">♠</span> Spades (lowest)</li>
               <li><span className="suit">♣</span> Clubs</li>
-              <li><span className="suit">♦</span> Diamonds</li>
-              <li><span className="suit">♥</span> Hearts (highest)</li>
+              <li><span className="suit" style={{color: "#e94057"}}>♦</span> Diamonds</li>
+              <li><span className="suit" style={{color: "#e94057"}}>♥</span> Hearts (highest)</li>
             </ul>
           </div>
 
@@ -80,7 +80,7 @@ function Home() {
               <li>Pairs: Two cards of the same rank</li>
               <li>Triples: Three cards of the same rank</li>
               <li>Quads: Four cards of the same rank</li>
-              <li>Straights: Three or more consecutive cards (e.g., 5-6-7 or 8-9-10-J). A 2 cannot be part of a straight.</li>
+              <li>Straights: Three or more consecutive cards (Note: 2 cannot be part of a straight)</li>
               <li>Double Straights: Two or more consecutive pairs (e.g., 5-5-6-6-7-7)</li>
               <li>Special: A four of a kind or a double straight can be used to beat a single 2</li>
             </ul>
@@ -90,7 +90,7 @@ function Home() {
             <h3>Game Rules</h3>
             <ul>
               <li>The player with the lowest card starts the first round</li>
-              <li>Players must play a higher card or combination than the previous play. For combinations, the highest card determines if a combination is higher.</li>
+              <li>Players must play a higher card or combination than the previous play (for combinations, the highest card determines if a combination is higher)</li>
               <li>Players can pass if they cannot or do not want to play</li>
               <li>When all players pass, the last player to play gets a free turn</li>
               <li>The winner is the first player to get rid of all their cards</li>
@@ -107,4 +107,4 @@ function Home() {
   );
 }
 
-export default Home; 
+export default Home;
