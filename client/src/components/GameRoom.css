@@ -26,37 +26,46 @@
   align-items: center;
 }
 
-.chat-button {
+.chat-icon {
   position: relative;
-  background-color: rgb(64, 124, 177);
+  background-color: rgba(64, 124, 177, 0.9);
   color: white;
   border: none;
-  padding: 8px 13px;
-  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   cursor: pointer;
-  font-size: 15px;
-  font-weight: bold;
   transition: all 0.2s ease-in-out;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  padding: 0;
+  margin-right: 5px;
 }
 
-.chat-button:hover {
-  filter: brightness(1.1);
-  transform: scale(1.05);
+.chat-icon svg {
+  width: 20px;
+  height: 20px;
 }
 
-.chat-button:active {
+.chat-icon:hover {
+  transform: scale(1.1);
+  background: rgba(64, 124, 177, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.chat-icon:active {
   transform: scale(0.95);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
 
 .chat-notification {
   position: absolute;
-  top: -3px;
-  right: -3px;
-  width: 12px;
-  height: 12px;
-  background-color: red;
+  top: 0;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  background-color: #ff3b30;
   border-radius: 50%;
 }
 

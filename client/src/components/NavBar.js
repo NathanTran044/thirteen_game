@@ -11,7 +11,9 @@ function Navbar() {
 
   return (
     <header className="App-header">
-      <h1>Thirteen</h1>
+      <Link to="/" style={{ textDecoration: 'none' }}>
+        <h1>Thirteen</h1>
+      </Link>
       <nav>
         <Link to="/" className={isActive("/") ? "active" : ""}>
           Home

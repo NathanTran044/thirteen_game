@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import './Home.css';
 
 function Home() {
   // Create an array of card suits for the pattern
   const cardSuits = ['♠', '♣', '♦', '♥'];
+  const cardPatternRef = useRef(null);
   
   // Generate card pattern items in a checkered pattern (12x12 grid)
   const generateCardPattern = () => {
@@ -30,6 +31,50 @@ function Home() {
     return items;
   };
 
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!cardPatternRef.current) return;
+      
+      const patternItems = cardPatternRef.current.querySelectorAll('.parallax');
+      const containerRect = cardPatternRef.current.getBoundingClientRect();
+      
+      const centerX = containerRect.width / 2;
+      const centerY = containerRect.height / 2;
+      
+      const mouseX = e.clientX - containerRect.left;
+      const mouseY = e.clientY - containerRect.top;
+      
+      const offsetX = (mouseX - centerX) / 25;
+      const offsetY = (mouseY - centerY) / 25;
+      
+      patternItems.forEach((item) => {
+        const depth = parseFloat(item.getAttribute('data-depth'));
+        const itemX = offsetX * depth;
+        const itemY = offsetY * depth;
+        
+        item.style.transform = `translateX(${itemX}px) translateY(${itemY}px)`;
+      });
+    };
+    
+    document.addEventListener('mousemove', handleMouseMove);
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
+  const renderCardDivider = () => {
+    return (
+      <div className="card-divider">
+        <div className="card-divider-item" data-suit="♠"></div>
+        <div className="card-divider-item" data-suit="♣"></div>
+        <div className="card-divider-item" data-suit="♦"></div>
+        <div className="card-divider-item" data-suit="♥"></div>
+        <div className="card-divider-item" data-suit="♠"></div>
+      </div>
+    );
+  };
+
   return (
     <div className="home-container">
       <div className="card-pattern">
@@ -39,16 +84,10 @@ function Home() {
         <div className="home-header">
           <h1>Welcome to Thirteen</h1>
           <p>Our version of the classic Vietnamese card game Tiến Lên (Thirteen)</p>
-          <div className="card-suits">
-            <span className="suit-icon">♠</span>
-            <span className="suit-icon">♣</span>
-            <span className="suit-icon">♦</span>
-            <span className="suit-icon">♥</span>
-          </div>
+          {renderCardDivider()}
         </div>
 
         <div className="instructions">
-          <h2>How to Play</h2>
 
           <div className="instructions-section">
             <h3>Game Overview</h3>
@@ -98,6 +137,13 @@ function Home() {
             </ul>
           </div>
         </div>
+
+        <div className="card-suits">
+            <span className="suit-icon">♠</span>
+            <span className="suit-icon">♣</span>
+            <span className="suit-icon">♦</span>
+            <span className="suit-icon">♥</span>
+          </div>
 
         <Link to="/lobby" className="play-button">
           Play Now
