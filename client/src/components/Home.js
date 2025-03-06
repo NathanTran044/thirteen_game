@@ -148,7 +148,7 @@ function Home() {
           <h1>Welcome to Thirteen</h1>
           <p>Our version of the classic Vietnamese card game Tiến Lên (Thirteen)</p>
           <div className="hero-buttons">
-            <Link to="/lobby" className="play-button large">
+            <Link to="/lobby" className="home-play-button large">
               Play Now
             </Link>
             <button onClick={scrollToInstructions} className="learn-button">
@@ -277,7 +277,7 @@ function Home() {
                   </div>
                 </div>
                 <h4>Single Cards</h4>
-                <p>One card.</p>
+                <p>Play any single card. Must be higher than the previous single card played.</p>
               </div>
               
               <div class="play-card">
