@@ -269,118 +269,118 @@ function Home() {
           <div className={`instructions-section animate-on-scroll ${activeTab === 'plays' ? 'active' : ''}`}>
             <h3>Valid Plays</h3>
             <div className="plays-grid">
-              <div class="play-card">
-                <div class="play-icon">
-                  <div class="mini-card black">
-                    <span class="rank">A</span>
-                    <span class="suit">♠</span>
+              <div className="play-card">
+                <div className="play-icon">
+                  <div className="mini-card black">
+                    <span className="rank">A</span>
+                    <span className="suit">♠</span>
                   </div>
                 </div>
                 <h4>Single Cards</h4>
                 <p>Play any single card. Must be higher than the previous single card played.</p>
               </div>
               
-              <div class="play-card">
-                <div class="play-icon">
-                  <div class="mini-card black">
-                    <span class="rank">J</span>
-                    <span class="suit">♣</span>
+              <div className="play-card">
+                <div className="play-icon">
+                  <div className="mini-card black">
+                    <span className="rank">J</span>
+                    <span className="suit">♣</span>
                   </div>
-                  <div class="mini-card black">
-                    <span class="rank">J</span>
-                    <span class="suit">♠</span>
+                  <div className="mini-card black">
+                    <span className="rank">J</span>
+                    <span className="suit">♠</span>
                   </div>
                 </div>
                 <h4>Pairs</h4>
                 <p>Two cards of the same rank.</p>
               </div>
               
-              <div class="play-card">
-                <div class="play-icon">
-                  <div class="mini-card red">
-                    <span class="rank">Q</span>
-                    <span class="suit">♥</span>
+              <div className="play-card">
+                <div className="play-icon">
+                  <div className="mini-card red">
+                    <span className="rank">Q</span>
+                    <span className="suit">♥</span>
                   </div>
-                  <div class="mini-card red">
-                    <span class="rank">Q</span>
-                    <span class="suit">♦</span>
+                  <div className="mini-card red">
+                    <span className="rank">Q</span>
+                    <span className="suit">♦</span>
                   </div>
-                  <div class="mini-card black">
-                    <span class="rank">Q</span>
-                    <span class="suit">♠</span>
+                  <div className="mini-card black">
+                    <span className="rank">Q</span>
+                    <span className="suit">♠</span>
                   </div>
                 </div>
                 <h4>Triples</h4>
                 <p>Three cards of the same rank.</p>
               </div>
               
-              <div class="play-card">
-                <div class="play-icon">
-                  <div class="mini-card red">
-                    <span class="rank">K</span>
-                    <span class="suit">♥</span>
+              <div className="play-card">
+                <div className="play-icon">
+                  <div className="mini-card red">
+                    <span className="rank">K</span>
+                    <span className="suit">♥</span>
                   </div>
-                  <div class="mini-card red">
-                    <span class="rank">K</span>
-                    <span class="suit">♦</span>
+                  <div className="mini-card red">
+                    <span className="rank">K</span>
+                    <span className="suit">♦</span>
                   </div>
-                  <div class="mini-card black">
-                    <span class="rank">K</span>
-                    <span class="suit">♣</span>
+                  <div className="mini-card black">
+                    <span className="rank">K</span>
+                    <span className="suit">♣</span>
                   </div>
-                  <div class="mini-card black">
-                    <span class="rank">K</span>
-                    <span class="suit">♠</span>
+                  <div className="mini-card black">
+                    <span className="rank">K</span>
+                    <span className="suit">♠</span>
                   </div>
                 </div>
                 <h4>Four of a Kind</h4>
                 <p>Four cards of the same rank.</p>
               </div>
               
-              <div class="play-card">
-                <div class="play-icon">
-                  <div class="mini-card red">
-                    <span class="rank">4</span>
-                    <span class="suit">♥</span>
+              <div className="play-card">
+                <div className="play-icon">
+                  <div className="mini-card red">
+                    <span className="rank">4</span>
+                    <span className="suit">♥</span>
                   </div>
-                  <div class="mini-card black">
-                    <span class="rank">5</span>
-                    <span class="suit">♠</span>
+                  <div className="mini-card black">
+                    <span className="rank">5</span>
+                    <span className="suit">♠</span>
                   </div>
-                  <div class="mini-card red">
-                    <span class="rank">6</span>
-                    <span class="suit">♦</span>
+                  <div className="mini-card red">
+                    <span className="rank">6</span>
+                    <span className="suit">♦</span>
                   </div>
                 </div>
                 <h4>Straights</h4>
                 <p>Three or more consecutive cards. A 2 cannot be part of this straight.</p>
               </div>
               
-              <div class="play-card">
-                <div class="play-icon">
-                  <div class="mini-card red">
-                    <span class="rank">9</span>
-                    <span class="suit">♥</span>
+              <div className="play-card">
+                <div className="play-icon">
+                  <div className="mini-card red">
+                    <span className="rank">9</span>
+                    <span className="suit">♥</span>
                   </div>
-                  <div class="mini-card black">
-                    <span class="rank">9</span>
-                    <span class="suit">♠</span>
+                  <div className="mini-card black">
+                    <span className="rank">9</span>
+                    <span className="suit">♠</span>
                   </div>
-                  <div class="mini-card red">
-                    <span class="rank">10</span>
-                    <span class="suit">♦</span>
+                  <div className="mini-card red">
+                    <span className="rank">10</span>
+                    <span className="suit">♦</span>
                   </div>
-                  <div class="mini-card black">
-                    <span class="rank">10</span>
-                    <span class="suit">♣</span>
+                  <div className="mini-card black">
+                    <span className="rank">10</span>
+                    <span className="suit">♣</span>
                   </div>
-                  <div class="mini-card red">
-                    <span class="rank">J</span>
-                    <span class="suit">♥</span>
+                  <div className="mini-card red">
+                    <span className="rank">J</span>
+                    <span className="suit">♥</span>
                   </div>
-                  <div class="mini-card black">
-                    <span class="rank">J</span>
-                    <span class="suit">♣</span>
+                  <div className="mini-card black">
+                    <span className="rank">J</span>
+                    <span className="suit">♣</span>
                   </div>
 
                 </div>
@@ -388,64 +388,64 @@ function Home() {
                 <p>Two or more consecutive pairs. A 2 cannot be part of this straight.</p>
               </div>
               
-              <div class="play-card special-rule">
-                <div class="corner-ribbon">
+              <div className="play-card special-rule">
+                <div className="corner-ribbon">
                   <span>SPECIAL</span>
                 </div>
 
-                <div class="special-rule-right">
+                <div className="special-rule-right">
                   <h4>Special Rule: Beating a 2</h4>
-                  <div class="special-rule-content">
+                  <div className="special-rule-content">
                     <p>The powerful 2 card can normally only be beaten by another 2 of higher suit. However, there are two special combinations that can defeat a single 2:</p>
                     
-                    <div class="special-rule-example">
-                      <div class="cards-container">
-                        <span class="card played">
+                    <div className="special-rule-example">
+                      <div className="cards-container">
+                        <span className="card played">
                           8
                         </span>
-                        <span class="card played">
+                        <span className="card played">
                           8
                         </span>
-                        <span class="card played">
+                        <span className="card played">
                           8
                         </span>
-                        <span class="card played">
+                        <span className="card played">
                           8
                         </span>
                       </div>
-                      <span class="beats">➜</span>
-                      <div class="cards-container">
-                        <span class="card single-two red">
+                      <span className="beats">➜</span>
+                      <div className="cards-container">
+                        <span className="card single-two red">
                           2
                         </span>
                       </div>
                       <span style={{ marginLeft: "10px", fontSize: "0.95rem", color: "#555", fontStyle: "italic" }}>Four of a kind beats a single 2</span>
                     </div>
                     
-                    <div class="special-rule-example">
-                      <div class="cards-container">
-                        <span class="card played red">
+                    <div className="special-rule-example">
+                      <div className="cards-container">
+                        <span className="card played red">
                           5
                         </span>
-                        <span class="card played">
+                        <span className="card played">
                           5
                         </span>
-                        <span class="card played red">
+                        <span className="card played red">
                           6
                         </span>
-                        <span class="card played">
+                        <span className="card played">
                           6
                         </span>
-                        <span class="card played red">
+                        <span className="card played red">
                           7
                         </span>
-                        <span class="card played">
+                        <span className="card played">
                           7
                         </span>
                       </div>
-                      <span class="beats">➜</span>
-                      <div class="cards-container">
-                        <span class="card single-two red">
+                      <span className="beats">➜</span>
+                      <div className="cards-container">
+                        <span className="card single-two red">
                           2
                         </span>
                       </div>
