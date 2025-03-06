@@ -7,7 +7,7 @@ import Home from "./components/Home";
 import NavBar from "./components/NavBar";
 import io from "socket.io-client";
 
-const socket = io.connect("http://localhost:3001");
+const socket = io.connect(process.env.REACT_APP_SOCKET_URL);
 
 function App() {
   return (
