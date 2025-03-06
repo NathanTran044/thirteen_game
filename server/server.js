@@ -11,7 +11,7 @@ app.use(express.json()); // Needed to parse JSON in POST requests
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: "https://thirteen-game.vercel.app",
     methods: ["GET", "POST"],
   },
   pingTimeout: 5000, // Close connection if client doesn't respond to ping within 5s
