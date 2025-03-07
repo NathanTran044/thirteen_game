@@ -102,8 +102,8 @@ function Home() {
   // Example card combinations to display
   const exampleHands = [
     { name: "Lowest Card", cards: ["3♠"], description: "The lowest single card in the game. The player with this card starts the first game." },
-    { name: "Highest Card", cards: ["2♥"], description: "The highest single card in the game" },
-    { name: "Instant Win", cards: ["2♠", "2♣", "2♦", "2♥"], description: "Playing all 2s gives you an instant win" }
+    { name: "Highest Card", cards: ["2♥"], description: "The highest single card in the game." },
+    { name: "Instant Win", cards: ["2♠", "2♣", "2♦", "2♥"], description: "Playing all 2s gives you an instant win." }
   ];
 
   const renderCardCombination = (combination, index) => {

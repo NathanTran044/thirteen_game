@@ -399,6 +399,9 @@ io.on("connection", (socket) => {
       }
 
       currentPlayer.skipped = true;
+      io.to(game.room).emit("player_passed", {
+        playerName: playerNames[currentPlayer.id]
+      });
 
       // Check if all active players passed, only happens after a player has finished and all next players pass leading to free turn
       const activePlayers = game.players.filter(p => !p.finished);
@@ -419,18 +422,28 @@ io.on("connection", (socket) => {
         game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
       } while (game.players[game.currentPlayerIndex].skipped || game.players[game.currentPlayerIndex].finished);
 
-      // need to let next player play any card if everone passed
+      // need to let next player play any card if everyone passed
       if (allPassed) {
         game.lastPlayedIndex = game.currentPlayerIndex;
+
+        // Notify players that the round was won by the last player who played
+        io.to(game.room).emit("all_passed", {
+          playerName: playerNames[game.players[game.lastPlayedIndex].id]
+        });
       }
 
       if (game.lastPlayedIndex == game.currentPlayerIndex) {
         game.lastPlayedCard = ""
+        
+        // If this is not part of the allPassed case (which already emits round_won),
+        // emit round_won here as well
+        if (!allPassed) {
+          // Notify players that the round was won by the current player
+          io.to(game.room).emit("round_won", {
+            playerName: playerNames[game.players[game.currentPlayerIndex].id]
+          });
+        }
       }
-
-      io.to(game.room).emit("player_passed", {
-        playerName: playerNames[currentPlayer.id]
-      });
   
       io.to(game.room).emit("game_state_update", {
         gameId,
@@ -629,11 +642,18 @@ io.on("connection", (socket) => {
       }
     }
   
-    // Move to next player
+    // Move to the next player
     do {
       game.currentPlayerIndex = (game.currentPlayerIndex + 1) % game.players.length;
     } while (game.players[game.currentPlayerIndex].skipped || game.players[game.currentPlayerIndex].finished);
-  
+    
+    // Set the current player's turn
+    game.players[game.currentPlayerIndex].isTurn = true;
+    
+    // Check if all other active players have passed
+    checkAllOtherPlayersPassed(game);
+    
+    // Update game state for all players
     io.to(game.room).emit("game_state_update", {
       gameId,
       currentTurn: playerNames[game.players[game.currentPlayerIndex].id],
@@ -768,6 +788,42 @@ setInterval(() => {
     }
   });
 }, 30000);
+
+// Function to check if all other active players have passed
+function checkAllOtherPlayersPassed(game) {
+  // Get all active players (not finished)
+  const activePlayers = game.players.filter(p => !p.finished);
+  
+  // If there's only one active player, no need to check
+  if (activePlayers.length <= 1) return;
+  
+  // Get the player who just played (the one before the current player)
+  const lastPlayedIndex = game.lastPlayedIndex;
+  const playerWhoJustPlayed = game.players[lastPlayedIndex];
+  
+  // Check if all other active players have skipped
+  const allOthersPassed = activePlayers
+    .filter(p => p.id !== playerWhoJustPlayed.id) // Exclude the player who just played
+    .every(p => p.skipped); // Check if all others have skipped
+  
+  if (allOthersPassed) {
+    console.log("All other players passed. Clearing the table for a free turn.");
+    
+    // Clear the table
+    game.lastPlayedCard = "";
+    
+    // Reset all skips
+    activePlayers.forEach(p => (p.skipped = false));
+    
+    // Set the current player to the one who just played
+    game.currentPlayerIndex = lastPlayedIndex;
+    
+    // Notify players that the round was won
+    io.to(game.room).emit("round_won", {
+      playerName: playerNames[playerWhoJustPlayed.id]
+    });
+  }
+}
 
 server.listen(3001, () => {
   console.log("Server running on port 3001");

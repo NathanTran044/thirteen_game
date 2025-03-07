@@ -246,10 +246,32 @@ function GameRoom({ socket }) {
       });
     });
 
+    socket.on("round_won", (data) => {
+      toast.success(`${data.playerName} won the round! They get a free turn.`, {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        pauseOnHover: false,
+        theme: "light",
+      });
+    });
+
+    socket.on("all_passed", (data) => {
+      toast.success(`Everyone passed. ${data.playerName} gets a free turn.`, {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        pauseOnHover: false,
+        theme: "light",
+      });
+    });
+
     socket.on("player_finished", (data) => {
-      // setPlayerCards([]);
-      // setGameStarted(false);
-      toast.info(`${data.finished} has finished`, {
+      toast.success(`${data.finished} has finished`, {
         position: "top-center",
         autoClose: 2000,
         hideProgressBar: false,
@@ -264,15 +286,6 @@ function GameRoom({ socket }) {
     socket.on("game_over", (data) => {
       setPlayerCards([]);
       setFinishOrder(data.finishOrder);
-      toast.info(`Game over! Last Place: ${data.finished}`, {
-        position: "top-center",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        draggable: true,
-        pauseOnHover: false,
-        theme: "light",
-      });
     });
 
     socket.on("force_disconnect", () => {
@@ -291,6 +304,8 @@ function GameRoom({ socket }) {
       socket.off("game_over");
       socket.off("force_disconnect");
       socket.off("player_passed");
+      socket.off("round_won");
+      socket.off("all_passed");
     };
   }, [socket, isChatOpen, navigate]);
 
