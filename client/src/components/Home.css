@@ -1066,17 +1066,6 @@
     font-size: 1.1rem;
   }
   
-  .home-play-button {
-    padding: 0.8rem 2rem;
-    font-size: 1.1rem;
-    width: 80%;
-  }
-  
-  .home-play-button.large {
-    padding: 1rem 2.5rem;
-    font-size: 1.2rem;
-  }
-  
   .rule-number {
     min-width: 50px;
     font-size: 1.5rem;
@@ -1105,17 +1094,6 @@
     gap: 0.8rem;
   }
   
-  .hero-play-button {
-    padding: 0.8rem 2rem;
-    font-size: 1.1rem;
-    width: 80%;
-  }
-  
-  .learn-button {
-    padding: 0.8rem 2rem;
-    font-size: 1.1rem;
-    width: 80%;
-  }
 }
 
 @media (max-width: 576px) {
@@ -1182,12 +1160,6 @@
   
   .action-section h3 {
     font-size: 1.5rem;
-  }
-  
-  .hero-play-button {
-    width: 80%;
-    padding: 0.8rem 1.5rem;
-    font-size: 1.1rem;
   }
   
   .plays-grid {
@@ -1475,17 +1447,6 @@
     width: 100%;
   }
   
-  .hero-play-button {
-    width: 100%;
-    font-size: 1rem;
-    padding: 0.7rem 1.5rem;
-  }
-  
-  .learn-button {
-    width: 100%;
-    font-size: 1rem;
-    padding: 0.7rem 1.5rem;
-  }
 }
 
 /* Mobile adjustments for mini cards */
