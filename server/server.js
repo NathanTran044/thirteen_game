@@ -12,6 +12,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: "https://thirteen-game.vercel.app",
+    // origin: "http://localhost:3000",
     methods: ["GET", "POST"],
   },
   pingTimeout: 5000, // Close connection if client doesn't respond to ping within 5s
@@ -187,6 +188,21 @@ io.on("connection", (socket) => {
   socket.on("join_room", ({ username, room }, callback) => {
     const roomName = String(room);
 
+    // Check if player is already in a different room
+    const currentRoom = playerRooms[socket.id];
+    if (currentRoom && currentRoom !== roomName) {
+      // Leave the current room
+      socket.leave(currentRoom);
+      console.log(`User ${socket.id} left room: ${currentRoom}`);
+      
+      // Update the old room's size for all players in that room
+      const oldRoomSize = io.sockets.adapter.rooms.get(currentRoom)?.size || 0;
+      io.to(currentRoom).emit("room_info_update", { roomSize: oldRoomSize });
+      
+      // Remove from tracking if needed
+      delete playerRooms[socket.id];
+    }
+
     for (let gameId in gameSessions) {
       let game = gameSessions[gameId];
       if (game.room == roomName) {
@@ -227,15 +243,23 @@ io.on("connection", (socket) => {
       return;
     }
 
+    // Get the current room players
+    const roomPlayers = Array.from(io.sockets.adapter.rooms.get(room) || []);
+    
+    // Verify the actual number of players in the room
+    if (roomPlayers.length !== num_players) {
+      console.log(`Player count mismatch: expected ${num_players}, got ${roomPlayers.length}`);
+      socket.emit("invalid_move", { message: "Player count mismatch. Please try again." });
+      return;
+    }
+
     const player_cards = dealCards(num_players);
     if (!player_cards) {
       console.log("Failed to deal cards");
       return;
     }
 
-    // Emit begin game and game state update to only players in the room
-    io.to(room).emit("begin_game");
-
+    // Create game session first
     const gameId = uuidv4();
     gameSessions[gameId] = {
       players: [],
@@ -243,38 +267,91 @@ io.on("connection", (socket) => {
       room,
       lastPlayedCard: null,
       lastPlayedIndex: 0,
-      finishOrder: [] // Add array to track finish order
+      finishOrder: [], // Add array to track finish order
+      playersReady: 0   // Track how many players have received their cards
     };
-  
-    const roomPlayers = Array.from(io.sockets.adapter.rooms.get(room) || []);
-    let lowestCard = null;
-    let firstPlayerIndex = 0;
 
-    roomPlayers.forEach((socketId, index) => {
-      // Find the lowest card in the game
-      if (!lowestCard || cardSort(player_cards[index][0], lowestCard) < 0) {
-        lowestCard = player_cards[index][0];
-        firstPlayerIndex = index;
-      }
+    // Notify all players that game is starting
+    io.to(room).emit("begin_game");
 
-      gameSessions[gameId].players.push({
-        id: socketId,
-        hand: player_cards[index],
-        isTurn: false,
-        skipped: false,
-        finished: false
+    // Add a small delay to ensure all clients have processed the begin_game event
+    setTimeout(() => {
+      let lowestCard = null;
+      let firstPlayerIndex = 0;
+
+      // Send cards to each player with acknowledgment
+      roomPlayers.forEach((socketId, index) => {
+        // Find the lowest card in the game
+        if (!lowestCard || cardSort(player_cards[index][0], lowestCard) < 0) {
+          lowestCard = player_cards[index][0];
+          firstPlayerIndex = index;
+        }
+
+        gameSessions[gameId].players.push({
+          id: socketId,
+          hand: player_cards[index],
+          isTurn: false,
+          skipped: false,
+          finished: false
+        });
+
+        console.log("Sending player hand to " + socketId, " with cards: ", player_cards[index]);
+        
+        // Send cards with acknowledgment
+        io.sockets.sockets.get(socketId)?.emit("player_hand", player_cards[index], (ack) => {
+          if (ack && ack.received) {
+            // Increment the ready counter
+            gameSessions[gameId].playersReady++;
+            
+            // If all players are ready, start the game
+            if (gameSessions[gameId].playersReady === roomPlayers.length) {
+              startGameAfterAllReady(gameId, firstPlayerIndex);
+            }
+          } else {
+            console.log(`Player ${socketId} did not acknowledge receiving cards`);
+            // Retry sending cards after a short delay
+            setTimeout(() => {
+              io.sockets.sockets.get(socketId)?.emit("player_hand", player_cards[index], (ack) => {
+                if (ack && ack.received) {
+                  gameSessions[gameId].playersReady++;
+                  if (gameSessions[gameId].playersReady === roomPlayers.length) {
+                    startGameAfterAllReady(gameId, firstPlayerIndex);
+                  }
+                }
+              });
+            }, 1000);
+          }
+        });
       });
 
-      console.log("Sending player hand to " + socketId);
-      io.to(socketId).emit("player_hand", player_cards[index]);
-    });
+      // Fallback: If not all players acknowledge within 5 seconds, start the game anyway
+      setTimeout(() => {
+        if (gameSessions[gameId] && gameSessions[gameId].playersReady < roomPlayers.length) {
+          console.log(`Starting game ${gameId} after timeout with ${gameSessions[gameId].playersReady}/${roomPlayers.length} players ready`);
+          startGameAfterAllReady(gameId, firstPlayerIndex);
+        }
+      }, 5000);
+    }, 500);
+  });
 
+  // Helper function to start the game after all players are ready
+  function startGameAfterAllReady(gameId, firstPlayerIndex) {
+    // Check if game still exists (might have been cleaned up)
+    if (!gameSessions[gameId]) return;
+    
+    // Check if game has already started
+    if (gameSessions[gameId].gameStarted) return;
+    
+    // Mark game as started
+    gameSessions[gameId].gameStarted = true;
+    
     // Assign the first turn to the player with the lowest card
     gameSessions[gameId].currentPlayerIndex = firstPlayerIndex;
     gameSessions[gameId].lastPlayedIndex = firstPlayerIndex;
     gameSessions[gameId].players[firstPlayerIndex].isTurn = true;
 
-    io.to(room).emit("game_state_update", {
+    // Send the initial game state to all players
+    io.to(gameSessions[gameId].room).emit("game_state_update", {
       gameId,
       currentTurn: playerNames[gameSessions[gameId].players[gameSessions[gameId].currentPlayerIndex].id],
       players: gameSessions[gameId].players.map(player => ({
@@ -282,14 +359,7 @@ io.on("connection", (socket) => {
         cardCount: player.hand.length
       }))
     });
-
-    console.log("current player is " + playerNames[gameSessions[gameId].players[gameSessions[gameId].currentPlayerIndex].id]);
-
-    io.sockets.adapter.rooms.get(room).forEach((socketId) => {
-      console.log(`Sent game_state_update to socket: ${socketId}`);
-      console.log(gameSessions);
-    });
-  });
+  }
 
   socket.on("play_card", ({ gameId, selectedCard }) => {
     console.log("RUNNING play_card");

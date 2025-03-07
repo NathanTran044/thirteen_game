@@ -205,9 +205,14 @@ function GameRoom({ socket }) {
       setPlayers(data.players);
     });
 
-    socket.on("player_hand", (data) => {
+    socket.on("player_hand", (data, callback) => {
       console.log("Player hand updated:", data);
       setPlayerCards(data);
+      
+      // Acknowledge receipt of cards
+      if (callback && typeof callback === 'function') {
+        callback({ received: true });
+      }
     });
 
     socket.on("receive_message", (data) => {
