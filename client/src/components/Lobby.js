@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ToastContainer } from "react-toastify";
 
-function Lobby({ socket }) {
+function Lobby({ socket, serverReady }) {
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState("");
   const [roomSize, setRoomSize] = useState(0);
@@ -14,6 +14,20 @@ function Lobby({ socket }) {
 
   // Join Room
   const joinRoom = () => {
+    // Check server readiness first
+    if (!serverReady) {
+      toast.warn("Server is still warming up. Please wait a moment.", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        draggable: true,
+        pauseOnHover: false,
+        theme: "light",
+      });
+      return;
+    }
+
     if (username !== "" && room !== "") {
       socket.emit("join_room", { username, room }, (success, updatedSize, id) => {
         if (success) {

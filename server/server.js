@@ -8,6 +8,14 @@ const app = express();
 app.use(cors());
 app.use(express.json()); // Needed to parse JSON in POST requests
 
+// wakeup endpoint to start Render server
+app.get('/wake-up', (req, res) => {
+  res.status(200).json({ 
+    message: 'Server is awake and ready!',
+    timestamp: new Date().toISOString()
+  });
+});
+
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
