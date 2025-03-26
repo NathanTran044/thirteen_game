@@ -6,8 +6,6 @@ import GameRoom from "./components/GameRoom";
 import Home from "./components/Home";
 import NavBar from "./components/NavBar";
 import io from "socket.io-client";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 
 const SERVER_URL = "https://thirteen-game.onrender.com";
 // const SERVER_URL = "http://localhost:3001";
@@ -33,10 +31,6 @@ function App() {
         }
       } catch (error) {
         console.error("Failed to wake up server", error);
-        toast.error("Server might be sleeping. Please try again in a moment.", {
-          position: "top-right",
-          autoClose: 3000,
-        });
       }
     };
 
@@ -57,7 +51,6 @@ function App() {
     <Router>
       <div className="App">
         <NavBar />
-        <ToastContainer />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route 
