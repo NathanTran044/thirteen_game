@@ -601,7 +601,7 @@ io.on("connection", (socket) => {
   
     // Play the selectedCard
     currentPlayer.hand = currentPlayer.hand.filter((c) => !cards.includes(c));
-    game.lastPlayedCard = selectedCard;
+    game.lastPlayedCard = cards.join(" ");
     game.lastPlayedIndex = game.currentPlayerIndex;
 
     io.to(currentPlayer.id).emit("player_hand", currentPlayer.hand);

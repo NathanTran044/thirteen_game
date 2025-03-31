@@ -516,7 +516,7 @@ function Home() {
       </div>
       
       <div className="home-footer">
-      <span>Made with ♡ by </span>
+      <span>Made by </span>
       <a href="https://github.com/NathanTran044/thirteen_game" 
         target="_blank" 
         rel="noopener noreferrer"
